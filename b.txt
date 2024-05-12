@@ -1,0 +1,22 @@
+   case c: {
+            change_face(c);
+            change_face(c);
+            break;
+
+        }
+        case u: {
+            change_face(u);
+            change_face(u);
+            break;
+        }
+        case 2c: {
+            change_face(c);
+            change_face(c);
+            break;
+        }
+        case 2u: {
+            change_face(u);
+            change_face(u);
+            break;
+        }
+        error4 8 2 0 5 8 4 8
