@@ -229,12 +229,12 @@ int ins_vector[73][5] = {
 };
 int ins_set1[6] = {0, xc, zu, xu, zc, x2c};
 int ins_set2[6][9][10] = {
-        {{},                                 {}, {Fu,  Uu, Fc,  Rc,},                 {}, {}, {}, {Rc, Uc,  Ru, Fu},             {}, {Bc, Rc,  Bu,  Dc, Lu, Du, Lc},},
-        {{Lu},                               {}, {Fu,  Dc, Lu,  Du,  Fc},             {}, {}, {}, {Bc, Du,  Bu},                 {}, {Lu, D2c, Lc},},
-        {{Rc, Du, Bc,  Dc,  Ru},             {}, {Bc},                                {}, {}, {}, {Bc, D2c, Bu},                 {}, {Lu, Dc,  Lc},},
-        {{Fu, Rc, B2c, Fc},                  {}, {Lc,  Bu, Lu,  B2c, Dc, Bu},         {}, {}, {}, {Dc, Lu,  Du, Lc},             {}, {Bc, Dc,  Bu},},
-        {{Bu, Lc, Bc,  L2u, Du, Lc},         {}, {Rc,  Fu, L2c, Ru},                  {}, {}, {}, {Lu, Du,  Lc},                 {}, {Du, Bc,  Dc,  Bu},},
-        {{Du, Fc, L2c, Fu,  Du, Bc, Dc, Bu}, {}, {D2u, Fc, L2c, Fu,  Du, Bc, Dc, Bu}, {}, {}, {}, {Fc, L2c, Fu, Du, Bc, Dc, Bu}, {}, {Dc, Fc,  L2c, Fu, Du, Bc, Dc, Bu},},
+        {{},                                 {},                                      {Fu,  Uu, Fc,  Rc,},                 {Su,  Du,  Sc, Mc,  Bc, Mu, Bu}, {}, {Sc,  Dc,  Su, Mc,  Bc, Mu, Bu}, {Rc, Uc,  Ru, Fu},             {Mc,  U2c, Mu,  U2c},        {Bc, Rc,  Bu,  Dc, Lu, Du, Lc},},
+        {{Lu},                               {Sc,  Mu,  Su},                          {Fu,  Dc, Lu,  Du,  Fc},             {Eu,  Bu,  Mc, Bc,  Mu},         {}, {Ec,  Bc,  Mc, Bu,  Mu},         {Bc, Du,  Bu},                 {D2c, Mc,  Bc,  Mu, Bu},     {Lu, D2c, Lc},},
+        {{Rc, Du, Bc,  Dc,  Ru},             {Rc,  Bc,  Mc, Bu,  Mu, Ru},             {Bc},                                {R2c, Bc,  Mc, Bu,  Mu, R2u},    {}, {Bc,  Mc,  Bu, Mu},              {Bc, D2c, Bu},                 {Ru,  Bc,  Mc,  Bu, Mu, Rc}, {Lu, Dc,  Lc},},
+        {{Fu, Rc, B2c, Fc},                  {Mc,  Bc,  Mu, Bu,  Ec, Bu, Mc, Bc, Mu}, {Lc,  Bu, Lu,  B2c, Dc, Bu},         {Ec,  Bu,  Mc, Bc,  Mu},         {}, {Eu,  Bc,  Mc, Bu,  Mu},         {Dc, Lu,  Du, Lc},             {Mc,  Bc,  Mu,  Bu},         {Bc, Dc,  Bu},},
+        {{Bu, Lc, Bc,  L2u, Du, Lc},         {Lu,  Bu,  Mc, Bc,  Mu, Lc},             {Rc,  Fu, L2c, Ru},                  {Bu,  Mc,  Bc, Mu},              {}, {L2u, Bu,  Mc, Bc,  Mu, L2c},    {Lu, Du,  Lc},                 {Lc,  Bu,  Mc,  Bc, Mu, Lu}, {Du, Bc,  Dc,  Bu},},
+        {{Du, Fc, L2c, Fu,  Du, Bc, Dc, Bu}, {D2c, B2c, Mc, B2u, Mu},                 {D2u, Fc, L2c, Fu,  Du, Bc, Dc, Bu}, {Du,  B2c, Mc, B2u, Mu},         {}, {Dc,  B2c, Mc, B2u, Mu},         {Fc, L2c, Fu, Du, Bc, Dc, Bu}, {B2c, Mc,  B2u, Mu},         {Dc, Fc,  L2c, Fu, Du, Bc, Dc, Bu},},
 
 };
 
@@ -247,6 +247,18 @@ int ins_set3[10][15] = {
         {Ru,  Fc, Rc, Fu, Uu, Fu,  Uc,  Fc},
         {Rc,  Uc, Ru, Uc, Rc, U2c, Ru,  yc},
 };
+
+void handle() {
+    SDL_Event ev;
+    while (SDL_PollEvent(&ev)) {
+        if ((SDL_QUIT == ev.type) ||
+            (SDL_KEYDOWN == ev.type && SDLK_ESCAPE == ev.key.keysym.sym)) {
+            SDL_DestroyWindow(window);
+            SDL_Quit();
+            exit(0);
+        }
+    }
+}
 
 void change_num(int *ptr[], int flag) {
     switch (flag) {
@@ -801,6 +813,7 @@ void draw(int flag, double angle) {
         //  glMatrixMode(GL_MODELVIEW);
     }
     SDL_GL_SwapWindow(window);
+    handle();
 }
 
 void draw_cube(int flag) {
@@ -834,12 +847,12 @@ void solve() {
     for (int count = 0; count < 4; count++) {
         for (int i = 0; i < 6; i++) {
             for (int j = 0; j < 9; j++) {
-                if (faces[i][j] == White) {
+                if (faces[i][j] == White && neighbor_vector[i][j][2] != -1) {
                     int color1 = faces[neighbor_vector[i][j][0]][neighbor_vector[i][j][1]], color2 = faces[neighbor_vector[i][j][2]][neighbor_vector[i][j][3]];
                     if (color1 == faces[3][4] && color2 == faces[4][4] ||
                         color2 == faces[3][4] && color1 == faces[4][4]) {
                         exe_line(ins_set2[i][j]);
-                        arr[count][0]=i,arr[count][1]=j;
+                        arr[count][0] = i, arr[count][1] = j;
                         if (faces[3][4] != faces[3][2] || faces[4][4] != faces[4][0])
                             printf("%d %d\n", i, j);
                     }
@@ -848,11 +861,11 @@ void solve() {
         }
         draw_cube(yc);
     }
-    if(faces[0][0]!=faces[0][2]||faces[0][2]!=faces[0][6]||faces[0][6]!=faces[0][8]||faces[0][8]!=faces[0][0])
-    {
-        printf("error");
-        for(int i=0;i<4;i++)
-            printf("%d %d ",arr[i][0],arr[i][1]);
+    if (faces[0][0] != faces[0][2] || faces[0][2] != faces[0][6] || faces[0][6] != faces[0][8] ||
+        faces[0][8] != faces[0][0]) {
+        printf("error1");
+        for (int i = 0; i < 4; i++)
+            printf("%d %d ", arr[i][0], arr[i][1]);
         while (1)
             draw_cube(yc);
     }
@@ -860,13 +873,13 @@ void solve() {
     int flag = 0;
     while (flag == 0) {
         for (int i = 0; i < 4; i++) {
-            if (faces[1][0] == faces[1][2] && faces[2][0] == faces[2][2] && faces[3][0] == faces[3][2] &&
-                faces[4][0] == faces[4][2]) {
-                flag = 1;
-                break;
-            } else if (faces[0][0] == faces[0][2] && faces[0][2] == faces[0][6] && faces[0][6] == faces[0][8]) {
-                if (faces[1][0] != faces[1][2] && faces[2][0] != faces[2][2] && faces[3][0] != faces[3][2] &&
-                    faces[4][0] != faces[4][2]) {
+            if (faces[0][0] == faces[0][2] && faces[0][2] == faces[0][6] && faces[0][6] == faces[0][8]) {
+                if (faces[1][0] == faces[1][2] && faces[2][0] == faces[2][2] && faces[3][0] == faces[3][2] &&
+                    faces[4][0] == faces[4][2] && faces[0][0] == faces[0][2]) {
+                    flag = 1;
+                    break;
+                } else if (faces[1][0] != faces[1][2] && faces[2][0] != faces[2][2] && faces[3][0] != faces[3][2] &&
+                           faces[4][0] != faces[4][2]) {
                     exe_line(ins_set3[1]);
                     break;
                 } else if (faces[1][0] != faces[1][2] && faces[3][0] == faces[3][2]) {
@@ -888,18 +901,35 @@ void solve() {
             } else if (faces[4][0] == faces[2][2] && faces[2][2] == faces[0][8] && faces[0][8] == faces[0][6]) {
                 exe_line(ins_set3[6]);
                 break;
-            }
-            else if (faces[1][2] == faces[4][2] && faces[4][2] == faces[4][0] && faces[4][0] == faces[3][0]) {
+            } else if (faces[1][2] == faces[4][2] && faces[4][2] == faces[4][0] && faces[4][0] == faces[3][0]) {
                 exe_line(ins_set3[2]);
                 break;
-            }
-            else if (faces[1][0] == faces[1][2] && faces[1][2] == faces[3][0] && faces[3][0] == faces[3][2]) {
+            } else if (faces[1][0] == faces[1][2] && faces[1][2] == faces[3][0] && faces[3][0] == faces[3][2]) {
                 exe_line(ins_set3[2]);
                 break;
             }
             draw_cube(yc);
         }
-
+    }
+    if (faces[0][0] != faces[0][2] || faces[0][2] != faces[0][6] || faces[0][6] != faces[0][8] ||
+        faces[0][8] != faces[0][0])
+        printf("error5\n");
+    for (int count = 0; count < 4; count++) {
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 9; j++) {
+                if (faces[i][j] == faces[0][4] && neighbor_vector[i][j][2] == -1 &&
+                    faces[neighbor_vector[i][j][0]][neighbor_vector[i][j][1]] == faces[3][0]) {
+                    exe_line(ins_set2[i][j]);
+                    arr[count][0] = i, arr[count][1] = j;
+                    if (faces[3][0] != faces[3][1])
+                        printf("error2 %d %d\n", i, j);
+                    if (faces[0][0] != faces[0][2] || faces[0][2] != faces[0][6] || faces[0][6] != faces[0][8] ||
+                        faces[0][8] != faces[0][0])
+                        printf("error3 %d %d\n", i, j);
+                }
+            }
+        }
+        draw_cube(yc);
     }
 }
 
