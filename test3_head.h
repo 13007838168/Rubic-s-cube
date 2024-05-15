@@ -229,23 +229,33 @@ int ins_vector[73][5] = {
 };
 int ins_set1[6] = {0, xc, zu, xu, zc, x2c};
 int ins_set2[6][9][10] = {
-        {{},                                 {},                                      {Fu,  Uu, Fc,  Rc,},                 {Su,  Du,  Sc, Mc,  Bc, Mu, Bu}, {}, {Sc,  Dc,  Su, Mc,  Bc, Mu, Bu}, {Rc, Uc,  Ru, Fu},             {Mc,  U2c, Mu,  U2c},        {Bc, Rc,  Bu,  Dc, Lu, Du, Lc},},
-        {{Lu},                               {Sc,  Mu,  Su},                          {Fu,  Dc, Lu,  Du,  Fc},             {Eu,  Bu,  Mc, Bc,  Mu},         {}, {Ec,  Bc,  Mc, Bu,  Mu},         {Bc, Du,  Bu},                 {D2c, Mc,  Bc,  Mu, Bu},     {Lu, D2c, Lc},},
-        {{Rc, Du, Bc,  Dc,  Ru},             {Rc,  Bc,  Mc, Bu,  Mu, Ru},             {Bc},                                {R2c, Bc,  Mc, Bu,  Mu, R2u},    {}, {Bc,  Mc,  Bu, Mu},              {Bc, D2c, Bu},                 {Ru,  Bc,  Mc,  Bu, Mu, Rc}, {Lu, Dc,  Lc},},
-        {{Fu, Rc, B2c, Fc},                  {Mc,  Bc,  Mu, Bu,  Ec, Bu, Mc, Bc, Mu}, {Lc,  Bu, Lu,  B2c, Dc, Bu},         {Ec,  Bu,  Mc, Bc,  Mu},         {}, {Eu,  Bc,  Mc, Bu,  Mu},         {Dc, Lu,  Du, Lc},             {Mc,  Bc,  Mu,  Bu},         {Bc, Dc,  Bu},},
-        {{Bu, Lc, Bc,  L2u, Du, Lc},         {Lu,  Bu,  Mc, Bc,  Mu, Lc},             {Rc,  Fu, L2c, Ru},                  {Bu,  Mc,  Bc, Mu},              {}, {L2u, Bu,  Mc, Bc,  Mu, L2c},    {Lu, Du,  Lc},                 {Lc,  Bu,  Mc,  Bc, Mu, Lu}, {Du, Bc,  Dc,  Bu},},
-        {{Du, Fc, L2c, Fu,  Du, Bc, Dc, Bu}, {D2c, B2c, Mc, B2u, Mu},                 {D2u, Fc, L2c, Fu,  Du, Bc, Dc, Bu}, {Du,  B2c, Mc, B2u, Mu},         {}, {Dc,  B2c, Mc, B2u, Mu},         {Fc, L2c, Fu, Du, Bc, Dc, Bu}, {B2c, Mc,  B2u, Mu},         {Dc, Fc,  L2c, Fu, Du, Bc, Dc, Bu},},
+        {{},                                 {},                                      {Fu,  Uu, Fc,  Rc,},                 {Su,  Du,  Sc, Mc,  Bc, Mu, Bu}, {}, {Sc,  Dc,  Su, Mc,  Bc, Mu, Bu}, {Rc, Uc,  Ru, Fu},             {Mc,  Dc, Mu,  Dc, Mc, Bc, Mu, Bu}, {Bc, Rc,  Bu,  Dc, Lu, Du, Lc},},
+        {{Lu},                               {Sc,  Mu,  Su},                          {Fu,  Dc, Lu,  Du,  Fc},             {Eu,  Bu,  Mc, Bc,  Mu},         {}, {Ec,  Bc,  Mc, Bu,  Mu},         {Bc, Du,  Bu},                 {D2c, Mc, Bc,  Mu, Bu},             {Lu, D2c, Lc},},
+        {{Rc, Du, Bc,  Dc,  Ru},             {Rc,  Bc,  Mc, Bu,  Mu, Ru},             {Bc},                                {R2c, Bc,  Mc, Bu,  Mu, R2u},    {}, {Bc,  Mc,  Bu, Mu},              {Bc, D2c, Bu},                 {Ru,  Bc, Mc,  Bu, rc},             {Lu, Dc,  Lc},},
+        {{Fu, Rc, B2c, Fc},                  {Mc,  Bc,  Mu, Bu,  Ec, Bu, Mc, Bc, Mu}, {Lc,  Bu, Lu,  B2c, Dc, Bu},         {Ec,  Bu,  Mc, Bc,  Mu},         {}, {Eu,  Bc,  Mc, Bu,  Mu},         {Dc, Lu,  Du, Lc},             {Mc,  Bc, Mu,  Bu},                 {Bc, Dc,  Bu},},
+        {{Bu, Lc, Bc,  L2u, Du, Lc},         {Lu,  Bu,  Mc, Bc,  Mu, Lc},             {Rc,  Fu, L2c, Ru},                  {Bu,  Mc,  Bc, Mu},              {}, {L2u, Bu,  Mc, Bc,  Mu, L2c},    {Lu, Du,  Lc},                 {Lc,  Bu, Mc,  Bc, lu},             {Du, Bc,  Dc,  Bu},},
+        {{Du, Fc, L2c, Fu,  Du, Bc, Dc, Bu}, {D2c, B2c, Mc, B2u, Mu},                 {D2u, Fc, L2c, Fu,  Du, Bc, Dc, Bu}, {Du,  B2c, Mc, B2u, Mu},         {}, {Dc,  B2c, Mc, B2u, Mu},         {Fc, L2c, Fu, Du, Bc, Dc, Bu}, {B2c, Mc, B2u, Mu},                 {Dc, Fc,  L2c, Fu, Du, Bc, Dc, Bu},},
 
 };
 
-int ins_set3[10][15] = {
-        {Ru,  Du, Rc, Fc, Lu, Fu,  Lc,  Dc, Fu,  Rc, Fc, Ru,  x2c, yc},
-        {Ru,  Du, Rc, Du, Lc, Bu,  Lu,  Bc, D2c, Fu, Rc, Fc,  Ru,  x2c, yc},
-        {Rc,  Uc, Ru, Uc, Rc, U2c, Ru},
-        {y2c, Rc, Uc, Ru, Uc, Rc,  U2c, Uc, Ru,  Uc, Rc, U2c, Ru},
-        {yc,  Rc, Uc, Ru, Uc, Rc,  U2c, Ru},
-        {Ru,  Fc, Rc, Fu, Uu, Fu,  Uc,  Fc},
-        {Rc,  Uc, Ru, Uc, Rc, U2c, Ru,  yc},
+int ins_set3[15][15] = {
+        {Ru, Fc,  Rc,  Fu, Uu,  Fu,  Uc, Fc},
+        {yc, Rc,  Uu,  Ru, Uu,  Fu,  Uc, Fc},
+        {Fu, Uu,  Fc,  Uc, Fc,  Ru,  Fu, Rc},
+        {Fc, Ru,  Fu,  Rc, Fu,  Uu,  Fc},
+        {Rc, Uc,  Ru,  Uu, Fu,  Uu,  Fc},
+        {yc, Rc,  U2c, Ru, U2u, Ru,  Fc, Rc,  Fu},
+        {Ru, Fc,  Rc,  Fu, Rc,  Uu,  Ru, U2u, Ru, Fc, Rc, Fu},
+        {Rc, Uc,  Ru,  Uc, Rc,  U2c, Ru},
+        {Fu, Uc,  Fc,  Ru, Fc,  Rc,  Fu},
+        {Rc, U2u, Ru,  Uu, Rc,  Uu,  Ru},
+
+};
+int ins_set4[10][20] = {
+        {Mc,  Uc,  Mu,  Uu, Su, Uu, Mc, Uc, M2u, Uc, Mc, Uu, Sc, Uu, Mu, Uc, Mc},
+        {M2c, B2c, M2c, B2c},
+        {Mc,  B2c, Mu,  B2c},
+        {z2c}
 };
 
 void handle() {
@@ -837,6 +847,13 @@ void exe_line(int *ptr) {
     }
 }
 
+void change_line(int *ptr) {
+    while (*ptr != 0) {
+        change_face(*ptr);
+        ptr++;
+    }
+}
+
 void solve() {
     for (int i = 0; i < 6; i++)
         if (faces[i][4] == White) {
@@ -844,6 +861,7 @@ void solve() {
             break;
         }
     int arr[4][2];
+    //if (faces[0][0] != White || faces[0][2] != White || faces[0][6] != White || faces[0][8] != White)
     for (int count = 0; count < 4; count++) {
         for (int i = 0; i < 6; i++) {
             for (int j = 0; j < 9; j++) {
@@ -870,64 +888,166 @@ void solve() {
             draw_cube(yc);
     }
     draw_cube(x2u);
+
     int flag = 0;
+    // if (faces[0][0] != faces[0][2] || faces[0][2] != faces[0][6] || faces[0][6] != faces[0][8])
     while (flag == 0) {
         for (int i = 0; i < 4; i++) {
-            if (faces[0][0] == faces[0][2] && faces[0][2] == faces[0][6] && faces[0][6] == faces[0][8]) {
-                if (faces[1][0] == faces[1][2] && faces[2][0] == faces[2][2] && faces[3][0] == faces[3][2] &&
-                    faces[4][0] == faces[4][2] && faces[0][0] == faces[0][2]) {
-                    flag = 1;
-                    break;
-                } else if (faces[1][0] != faces[1][2] && faces[2][0] != faces[2][2] && faces[3][0] != faces[3][2] &&
-                           faces[4][0] != faces[4][2]) {
-                    exe_line(ins_set3[1]);
-                    break;
-                } else if (faces[1][0] != faces[1][2] && faces[3][0] == faces[3][2]) {
+            if (faces[0][0] == faces[0][8] && faces[0][8] == faces[1][0] && faces[1][0] == faces[2][2]) {
+                if (faces[1][2] == faces[4][0]) {
                     exe_line(ins_set3[0]);
                     break;
+                } else if (faces[0][2] != faces[1][2]) {
+                    draw_cube(y2c);
+                    exe_line(ins_set3[7]);
+                    exe_line(ins_set3[7]);
+                    exe_line(ins_set3[7]);
+                } else {
+
+                    exe_line(ins_set3[1]);
+
+                    break;
                 }
-            } else if (faces[0][0] == faces[0][2] && faces[0][2] == faces[1][0] && faces[1][0] == faces[1][2]) {
-                exe_line(ins_set3[2]);
-                break;
-            } else if (faces[0][0] == faces[1][0] && faces[1][0] == faces[2][0] && faces[2][0] == faces[3][0]) {
+            } else if (faces[0][0] == faces[0][2] && faces[0][2] == faces[0][6] && faces[0][6] == faces[0][8]) {
+                if (faces[1][0] != faces[1][2] && faces[3][0] == faces[3][2] ||
+                    faces[1][0] != faces[1][2] && faces[2][0] != faces[2][2] && faces[3][0] != faces[3][2] &&
+                    faces[4][0] != faces[4][2]) {
+                    exe_line(ins_set3[2]);
+                    break;
+                } else if (faces[1][0] == faces[1][2] && faces[2][0] == faces[2][2]) {
+                    flag = 1;
+                    break;
+                }
+            } else if (faces[0][8] == faces[2][2] && faces[2][2] == faces[3][2] && faces[3][2] == faces[4][2]) {
                 exe_line(ins_set3[3]);
                 break;
-            } else if (faces[0][0] == faces[1][2] && faces[1][2] == faces[2][2] && faces[2][2] == faces[4][2]) {
+            } else if (faces[0][6] == faces[0][8] && faces[0][8] == faces[2][2] && faces[2][2] == faces[4][0]) {
                 exe_line(ins_set3[4]);
                 break;
-            } else if (faces[0][0] == faces[0][8] && faces[0][8] == faces[1][0] && faces[1][0] == faces[2][2]) {
-                exe_line(ins_set3[5]);
-                break;
-            } else if (faces[4][0] == faces[2][2] && faces[2][2] == faces[0][8] && faces[0][8] == faces[0][6]) {
+            } else if (faces[0][2] == faces[1][0] && faces[1][0] == faces[2][0] && faces[2][0] == faces[4][0]) {
+                if (faces[0][8] == faces[3][2]) {
+                    if (faces[1][2] != faces[2][2]) {
+                        exe_line(ins_set3[8]);
+                        break;
+                    } else {
+                        exe_line(ins_set3[9]);
+                        break;
+                    }
+                } else {
+                    exe_line(ins_set3[5]);
+                    break;
+                }
+            } else if (faces[2][0] == faces[2][2] && faces[2][2] == faces[4][0] && faces[4][0] == faces[4][2] &&
+                       faces[0][6] == faces[0][8]) {
                 exe_line(ins_set3[6]);
                 break;
+            } else if (faces[0][0] == faces[0][2] && faces[0][2] == faces[1][0] && faces[1][0] == faces[1][2]) {
+                exe_line(ins_set3[7]);
+                break;
             } else if (faces[1][2] == faces[4][2] && faces[4][2] == faces[4][0] && faces[4][0] == faces[3][0]) {
-                exe_line(ins_set3[2]);
+                exe_line(ins_set3[7]);
                 break;
             } else if (faces[1][0] == faces[1][2] && faces[1][2] == faces[3][0] && faces[3][0] == faces[3][2]) {
-                exe_line(ins_set3[2]);
+                exe_line(ins_set3[7]);
                 break;
             }
             draw_cube(yc);
         }
     }
+
     if (faces[0][0] != faces[0][2] || faces[0][2] != faces[0][6] || faces[0][6] != faces[0][8] ||
         faces[0][8] != faces[0][0])
         printf("error5\n");
-    for (int count = 0; count < 4; count++) {
-        for (int i = 0; i < 6; i++) {
-            for (int j = 0; j < 9; j++) {
-                if (faces[i][j] == faces[0][4] && neighbor_vector[i][j][2] == -1 &&
-                    faces[neighbor_vector[i][j][0]][neighbor_vector[i][j][1]] == faces[3][0]) {
-                    exe_line(ins_set2[i][j]);
-                    arr[count][0] = i, arr[count][1] = j;
-                    if (faces[3][0] != faces[3][1])
-                        printf("error2 %d %d\n", i, j);
-                    if (faces[0][0] != faces[0][2] || faces[0][2] != faces[0][6] || faces[0][6] != faces[0][8] ||
-                        faces[0][8] != faces[0][0])
-                        printf("error3 %d %d\n", i, j);
+    while (1) {
+        for (int count = 0; count < 4; count++) {
+            for (int i = 0; i < 6; i++) {
+                for (int j = 0; j < 9; j++) {
+                    if (faces[i][j] == faces[0][4] && neighbor_vector[i][j][2] == -1 &&
+                        faces[neighbor_vector[i][j][0]][neighbor_vector[i][j][1]] == faces[3][0]) {
+                        exe_line(ins_set2[i][j]);
+                        arr[count][0] = i, arr[count][1] = j;
+                        if (faces[3][0] != faces[3][1])
+                            printf("error2 %d %d\n", i, j);
+                        if (faces[0][0] != faces[0][2] || faces[0][2] != faces[0][6] ||
+                            faces[0][6] != faces[0][8] ||
+                            faces[0][8] != faces[0][0])
+                            printf("error3 %d %d\n", i, j);
+                    }
                 }
             }
+            if (count == 0 || count == 2)
+                draw_cube(y2c);
+            else if (count == 1)
+                draw_cube(yc);
+        }
+        if (faces[5][1] == faces[5][3] && faces[5][3] == faces[5][5] && faces[5][5] == faces[5][7] &&
+            faces[1][6] == faces[1][7] && faces[2][6] == faces[2][7] && faces[3][6] == faces[3][7])
+            break;
+        int pos = 0;
+        int pos_arr[5] = {0, 7, 3, 1, 5}, ins_arr[5] = {0, 0, yc, y2c, yu};
+        for (int i = 1; i <= 4; i++) {
+            if (faces[i][6] == faces[5][pos_arr[i]] && faces[5][4] == faces[(i + 1) % 4 + 1][7]) {
+                if (pos == 0)
+                    pos = i;
+                else if (faces[(i + 2) % 4 + 1][6] == faces[5][pos_arr[(i + 2) % 4 + 1]] &&
+                         faces[5][4] == faces[(i + 3) % 4][7]) {
+                    pos = i;
+                    break;
+                }
+            }
+        }
+        //printf("%d\n", pos);
+        draw_cube(ins_arr[pos]);
+        draw_cube(x2u);
+    }
+
+    if (!(faces[0][1] == faces[0][3] && faces[0][3] == faces[0][5] && faces[0][5] == faces[0][7] &&
+          faces[1][0] == faces[1][1] && faces[2][0] == faces[2][1] && faces[3][0] == faces[3][1] &&
+          faces[5][1] == faces[5][3] && faces[5][3] == faces[5][5] && faces[5][5] == faces[5][7] &&
+          faces[1][6] == faces[1][7] && faces[2][6] == faces[2][7] && faces[3][6] == faces[3][7]))
+        printf("error6\n");
+    draw_cube(zu);
+    while (faces[0][0] != 2)
+        draw_cube(Lc);
+    while (faces[0][4] != 2)
+        draw_cube(Mc);
+    while (faces[0][2] != 2)
+        draw_cube(Ru);
+    for (int i = 0; i < 4; i++) {
+        int dif1 = abs(faces[0][1] - faces[0][4]);
+        if (dif1 != 2 && dif1 != 0) {
+            int dif2 = abs(faces[1][1] - faces[1][4]), dif3 = abs(faces[3][4] - faces[3][7]);
+            if (dif2 != 2 && dif2 != 0)
+                exe_line(ins_set4[0]);
+            else if (dif3 == 2 || dif3 == 0) {
+                draw_cube(F2c);
+                exe_line(ins_set4[0]);
+                draw_cube(F2c);
+                break;
+            }
+        }
+        draw_cube(xu);
+    }
+    for (int i = 0; i < 4; i++) {
+        if (faces[0][1] != faces[0][4] && faces[0][4] != faces[0][7]) {
+            exe_line(ins_set4[1]);
+        } else if (faces[0][1] != faces[0][4] && faces[5][1] == faces[0][4] && faces[1][7] == faces[3][4]) {
+            exe_line(ins_set4[2]);
+            break;
+        } else if (faces[0][7] != faces[0][4] && faces[5][7] == faces[0][4] && faces[3][7] == faces[1][4]) {
+            draw_cube(y2c);
+            exe_line(ins_set4[2]);
+            break;
+        }
+        draw_cube(xu);
+    }
+    for (int i = 0; i < 4; i++) {
+        if (faces[0][1] != faces[0][4] || faces[0][3] != faces[0][4] || faces[0][5] != faces[0][4] ||
+            faces[0][7] != faces[0][4]) {
+            printf("error9\n");
+            while (1)
+                draw_cube(yc);
+            break;
         }
         draw_cube(yc);
     }

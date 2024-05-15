@@ -113,19 +113,25 @@ main(int argc, char *argv[]) {
         glViewport(100, 0, w - 200, h);
 //int arr[18]={Ru,  Du, Rc, Du, Lc, Bu,  Lu,  Bc, D2c, Fu, Rc, Fc,  Ru,  x2c, yc};
     //    exe_line(arr);
-        int i = Rc;
+      /*  int i = Rc;
+        exe_line(ins_set4[0]);
+        while (1)
+            draw_cube(yc);*/
         if (t++ % 200 == 0) {
             srand(time(NULL));
+            //change_face(zu);
             for (int i = 0; i < 100; i++)
+
                 // 生成随机数
             {
 
                 randomNum = rand();
-
+                //change_line(ins_set4[randomNum%4]);
                 //  if(t%100==0)
                 change_face(randomNum % 72 + 1);
             }
             solve();
+          //  change_face(zc);
             for (int i = 1; i < 5; i++) {
                 if (faces[i][0] != faces[i][2] || faces[i][6] != faces[i][8]) {
                     printf("error");

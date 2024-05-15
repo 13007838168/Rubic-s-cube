@@ -21,3 +21,12 @@
         }
         error2 3 7
         error2 5 7
+        int ins_set3[10][15] = {
+                {Ru,  Du, Rc, Fc, Lu, Fu,  Lc,  Dc, Fu,  Rc, Fc, Ru,  x2c, yc},
+                {Ru,  Du, Rc, Du, Lc, Bu,  Lu,  Bc, D2c, Fu, Rc, Fc,  Ru,  x2c, yc},
+                {Rc,  Uc, Ru, Uc, Rc, U2c, Ru},
+                {y2c, Rc, Uc, Ru, Uc, Rc,  U2c, Uc, Ru,  Uc, Rc, U2c, Ru},
+                {yc,  Rc, Uc, Ru, Uc, Rc,  U2c, Ru},
+                {Ru,  Fc, Rc, Fu, Uu, Fu,  Uc,  Fc},
+                {Rc,  Uc, Ru, Uc, Rc, U2c, Ru,  yc},
+        };
