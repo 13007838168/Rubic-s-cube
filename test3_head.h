@@ -977,8 +977,12 @@ void solve() {
             }
             if (count == 0 || count == 2)
                 draw_cube(y2c);
-            else if (count == 1)
-                draw_cube(yc);
+            else if (count == 1) {
+                if (faces[4][1] == faces[0][4])
+                    draw_cube(yc);
+                else draw_cube(yu);
+            }
+
         }
         if (faces[5][1] == faces[5][3] && faces[5][3] == faces[5][5] && faces[5][5] == faces[5][7] &&
             faces[1][6] == faces[1][7] && faces[2][6] == faces[2][7] && faces[3][6] == faces[3][7])
@@ -987,13 +991,7 @@ void solve() {
         int pos_arr[5] = {0, 7, 3, 1, 5}, ins_arr[5] = {0, 0, yc, y2c, yu};
         for (int i = 1; i <= 4; i++) {
             if (faces[i][6] == faces[5][pos_arr[i]] && faces[5][4] == faces[(i + 1) % 4 + 1][7]) {
-                if (pos == 0)
-                    pos = i;
-                else if (faces[(i + 2) % 4 + 1][6] == faces[5][pos_arr[(i + 2) % 4 + 1]] &&
-                         faces[5][4] == faces[(i + 3) % 4][7]) {
-                    pos = i;
-                    break;
-                }
+                pos = i;
             }
         }
         //printf("%d\n", pos);

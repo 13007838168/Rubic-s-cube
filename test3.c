@@ -110,7 +110,7 @@ main(int argc, char *argv[]) {
         int w, h;
         SDL_GL_MakeCurrent(window, ctx);
         SDL_GetWindowSize(window, &w, &h);
-        glViewport(100, 0, w - 200, h);
+        glViewport(100, 0, w-200, h);
 //int arr[18]={Ru,  Du, Rc, Du, Lc, Bu,  Lu,  Bc, D2c, Fu, Rc, Fc,  Ru,  x2c, yc};
     //    exe_line(arr);
       /*  int i = Rc;
