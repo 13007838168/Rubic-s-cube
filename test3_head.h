@@ -266,6 +266,10 @@ void handle() {
             SDL_DestroyWindow(window);
             SDL_Quit();
             exit(0);
+        } else if (SDL_MOUSEBUTTONDOWN == ev.type) {
+            int x = ev.button.x, y = ev.button.y;
+            printf("%d %d\n",x,y);
+
         }
     }
 }
@@ -752,7 +756,7 @@ void draw(int flag, double angle) {
         glClearColor(0.0, 0.0, 0.0, 1.0);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
-        glScaled(0.78, 0.78, 0.78);
+        glScaled(0.78*2/3, 0.78, 0.78);
         glRotated(-45.0, 0.0, 1.0, 0.0); // 绕Y轴旋转45度
         glRotated(45.0, 1.0, 0.0, 0.0);
         if ((1 << block) & mask) {

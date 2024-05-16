@@ -2,5 +2,7 @@ D:/codes/ccodes/MY_PROJECT/Rubic's_Cube/cmake-build-debug/CMakeFiles/test1.dir
 D:/codes/ccodes/MY_PROJECT/Rubic's_Cube/cmake-build-debug/CMakeFiles/test2.dir
 D:/codes/ccodes/MY_PROJECT/Rubic's_Cube/cmake-build-debug/CMakeFiles/test3.dir
 D:/codes/ccodes/MY_PROJECT/Rubic's_Cube/cmake-build-debug/CMakeFiles/test4.dir
+D:/codes/ccodes/MY_PROJECT/Rubic's_Cube/cmake-build-debug/CMakeFiles/test5.dir
+D:/codes/ccodes/MY_PROJECT/Rubic's_Cube/cmake-build-debug/CMakeFiles/test6.dir
 D:/codes/ccodes/MY_PROJECT/Rubic's_Cube/cmake-build-debug/CMakeFiles/edit_cache.dir
 D:/codes/ccodes/MY_PROJECT/Rubic's_Cube/cmake-build-debug/CMakeFiles/rebuild_cache.dir

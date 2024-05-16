@@ -5,7 +5,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
-#include <GL/glu.h>
+#include <GL/glut.h>
 #include <time.h>
 #include "test3_head.h"
 /* Undefine this if you want a flat cube instead of a rainbow cube */
@@ -46,10 +46,9 @@ main(int argc, char *argv[]) {
             (
                     "SDL AR Example",
                     SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                    1000, 800,
+                    1200, 800,
                     SDL_WINDOW_OPENGL
             );
-
     if (window == NULL) {
         printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
         return 1;
@@ -110,7 +109,8 @@ main(int argc, char *argv[]) {
         int w, h;
         SDL_GL_MakeCurrent(window, ctx);
         SDL_GetWindowSize(window, &w, &h);
-        glViewport(100, 0, w-200, h);
+        glViewport(200, 0, w, h);
+        draw_cube(0);
 //int arr[18]={Ru,  Du, Rc, Du, Lc, Bu,  Lu,  Bc, D2c, Fu, Rc, Fc,  Ru,  x2c, yc};
     //    exe_line(arr);
       /*  int i = Rc;
@@ -128,7 +128,7 @@ main(int argc, char *argv[]) {
                 randomNum = rand();
                 //change_line(ins_set4[randomNum%4]);
                 //  if(t%100==0)
-                change_face(randomNum % 72 + 1);
+                //change_face(randomNum % 72 + 1);
             }
             solve();
           //  change_face(zc);
@@ -138,8 +138,6 @@ main(int argc, char *argv[]) {
                     while (1)
                         draw_cube(yc);
                 }
-
-
             }
         }
 
