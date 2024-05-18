@@ -1,5 +1,5 @@
 #include <stdio.h>
 int main(){
-  int a[3][2]={0};
-    printf("%d",a[3][3]);
+  int arr1[30],arr2[30],arr3[30];
+
 }

@@ -62,16 +62,16 @@ build CMakeFiles/test1.dir/test1.c.obj: C_COMPILER__test1_Debug D$:/codes/ccodes
 
 
 #############################################
-# Link the executable bin\test1.exe
+# Link the executable test1.exe
 
-build bin/test1.exe: C_EXECUTABLE_LINKER__test1_Debug CMakeFiles/test1.dir/test1.c.obj
+build test1.exe: C_EXECUTABLE_LINKER__test1_Debug CMakeFiles/test1.dir/test1.c.obj
   FLAGS = -g
   LINK_LIBRARIES = -lmingw32  -lSDL2main  -lSDL2  -lSDL2_image  -lSDL2_mixer  -lSDL2_ttf  -lopengl32  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   LINK_PATH = -LD:/software/SDL2/mingw(CLion+VSC)/SDL2-2.26.0-allinone/x86_64-w64-mingw32/lib   -L"D:/codes/ccodes/MY_PROJECT/Rubic's_Cube/lib/x64"
   OBJECT_DIR = CMakeFiles\test1.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
-  TARGET_FILE = bin\test1.exe
+  TARGET_FILE = test1.exe
   TARGET_IMPLIB = libtest1.dll.a
   TARGET_PDB = test1.exe.dbg
 
@@ -97,16 +97,16 @@ build CMakeFiles/test2.dir/test2.c.obj: C_COMPILER__test2_Debug D$:/codes/ccodes
 
 
 #############################################
-# Link the executable bin\test2.exe
+# Link the executable test2.exe
 
-build bin/test2.exe: C_EXECUTABLE_LINKER__test2_Debug CMakeFiles/test2.dir/test2.c.obj
+build test2.exe: C_EXECUTABLE_LINKER__test2_Debug CMakeFiles/test2.dir/test2.c.obj
   FLAGS = -g
   LINK_LIBRARIES = -lmingw32  -lSDL2main  -lSDL2  -lSDL2_image  -lSDL2_mixer  -lSDL2_ttf  -lopengl32  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   LINK_PATH = -LD:/software/SDL2/mingw(CLion+VSC)/SDL2-2.26.0-allinone/x86_64-w64-mingw32/lib   -L"D:/codes/ccodes/MY_PROJECT/Rubic's_Cube/lib/x64"
   OBJECT_DIR = CMakeFiles\test2.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
-  TARGET_FILE = bin\test2.exe
+  TARGET_FILE = test2.exe
   TARGET_IMPLIB = libtest2.dll.a
   TARGET_PDB = test2.exe.dbg
 
@@ -126,22 +126,29 @@ build CMakeFiles/test3.dir/test3.c.obj: C_COMPILER__test3_Debug D$:/codes/ccodes
   OBJECT_DIR = CMakeFiles\test3.dir
   OBJECT_FILE_DIR = CMakeFiles\test3.dir
 
+build CMakeFiles/test3.dir/test3_main.c.obj: C_COMPILER__test3_Debug D$:/codes/ccodes/MY_PROJECT/Rubic's_Cube/test3_main.c || cmake_object_order_depends_target_test3
+  DEP_FILE = CMakeFiles\test3.dir\test3_main.c.obj.d
+  FLAGS = -g
+  INCLUDES = -ID:/software/SDL2/mingw(CLion+VSC)/SDL2-2.26.0-allinone/x86_64-w64-mingw32/include/SDL2 -I"D:/codes/ccodes/MY_PROJECT/Rubic's_Cube/include"
+  OBJECT_DIR = CMakeFiles\test3.dir
+  OBJECT_FILE_DIR = CMakeFiles\test3.dir
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target test3
 
 
 #############################################
-# Link the executable bin\test3.exe
+# Link the executable test3.exe
 
-build bin/test3.exe: C_EXECUTABLE_LINKER__test3_Debug CMakeFiles/test3.dir/test3.c.obj
+build test3.exe: C_EXECUTABLE_LINKER__test3_Debug CMakeFiles/test3.dir/test3.c.obj CMakeFiles/test3.dir/test3_main.c.obj
   FLAGS = -g
   LINK_LIBRARIES = -lmingw32  -lSDL2main  -lSDL2  -lSDL2_image  -lSDL2_mixer  -lSDL2_ttf  -lopengl32  -Wl,-Bstatic  -lopengl32  -lfreeglut  -Wl,-Bdynamic  -lglu32  -lfreeglut  -lopengl32  -Wl,-Bstatic  -lopengl32  -lfreeglut  -Wl,-Bdynamic  -lglu32  -lfreeglut  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   LINK_PATH = -LD:/software/SDL2/mingw(CLion+VSC)/SDL2-2.26.0-allinone/x86_64-w64-mingw32/lib   -L"D:/codes/ccodes/MY_PROJECT/Rubic's_Cube/lib/x64"
   OBJECT_DIR = CMakeFiles\test3.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
-  TARGET_FILE = bin\test3.exe
+  TARGET_FILE = test3.exe
   TARGET_IMPLIB = libtest3.dll.a
   TARGET_PDB = test3.exe.dbg
 
@@ -167,16 +174,16 @@ build CMakeFiles/test4.dir/test4.c.obj: C_COMPILER__test4_Debug D$:/codes/ccodes
 
 
 #############################################
-# Link the executable bin\test4.exe
+# Link the executable test4.exe
 
-build bin/test4.exe: C_EXECUTABLE_LINKER__test4_Debug CMakeFiles/test4.dir/test4.c.obj
+build test4.exe: C_EXECUTABLE_LINKER__test4_Debug CMakeFiles/test4.dir/test4.c.obj
   FLAGS = -g
   LINK_LIBRARIES = -lmingw32  -lSDL2main  -lSDL2  -lSDL2_image  -lSDL2_mixer  -lSDL2_ttf  -lopengl32  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   LINK_PATH = -LD:/software/SDL2/mingw(CLion+VSC)/SDL2-2.26.0-allinone/x86_64-w64-mingw32/lib   -L"D:/codes/ccodes/MY_PROJECT/Rubic's_Cube/lib/x64"
   OBJECT_DIR = CMakeFiles\test4.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
-  TARGET_FILE = bin\test4.exe
+  TARGET_FILE = test4.exe
   TARGET_IMPLIB = libtest4.dll.a
   TARGET_PDB = test4.exe.dbg
 
@@ -202,16 +209,16 @@ build CMakeFiles/test5.dir/test5.c.obj: C_COMPILER__test5_Debug D$:/codes/ccodes
 
 
 #############################################
-# Link the executable bin\test5.exe
+# Link the executable test5.exe
 
-build bin/test5.exe: C_EXECUTABLE_LINKER__test5_Debug CMakeFiles/test5.dir/test5.c.obj
+build test5.exe: C_EXECUTABLE_LINKER__test5_Debug CMakeFiles/test5.dir/test5.c.obj
   FLAGS = -g
   LINK_LIBRARIES = -lmingw32  -lSDL2main  -lSDL2  -lSDL2_image  -lSDL2_mixer  -lSDL2_ttf  -lopengl32  -Wl,-Bstatic  -lopengl32  -lfreeglut  -Wl,-Bdynamic  -lglu32  -lfreeglut  -lopengl32  -Wl,-Bstatic  -lopengl32  -lfreeglut  -Wl,-Bdynamic  -lglu32  -lfreeglut  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   LINK_PATH = -LD:/software/SDL2/mingw(CLion+VSC)/SDL2-2.26.0-allinone/x86_64-w64-mingw32/lib   -L"D:/codes/ccodes/MY_PROJECT/Rubic's_Cube/lib/x64"
   OBJECT_DIR = CMakeFiles\test5.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
-  TARGET_FILE = bin\test5.exe
+  TARGET_FILE = test5.exe
   TARGET_IMPLIB = libtest5.dll.a
   TARGET_PDB = test5.exe.dbg
 
@@ -237,16 +244,16 @@ build CMakeFiles/test6.dir/test6.c.obj: C_COMPILER__test6_Debug D$:/codes/ccodes
 
 
 #############################################
-# Link the executable bin\test6.exe
+# Link the executable test6.exe
 
-build bin/test6.exe: C_EXECUTABLE_LINKER__test6_Debug CMakeFiles/test6.dir/test6.c.obj
+build test6.exe: C_EXECUTABLE_LINKER__test6_Debug CMakeFiles/test6.dir/test6.c.obj
   FLAGS = -g
   LINK_LIBRARIES = -lmingw32  -lSDL2main  -lSDL2  -lSDL2_image  -lSDL2_mixer  -lSDL2_ttf  -lopengl32  -Wl,-Bstatic  -lopengl32  -lfreeglut  -Wl,-Bdynamic  -lglu32  -lfreeglut  -lopengl32  -Wl,-Bstatic  -lopengl32  -lfreeglut  -Wl,-Bdynamic  -lglu32  -lfreeglut  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   LINK_PATH = -LD:/software/SDL2/mingw(CLion+VSC)/SDL2-2.26.0-allinone/x86_64-w64-mingw32/lib   -L"D:/codes/ccodes/MY_PROJECT/Rubic's_Cube/lib/x64"
   OBJECT_DIR = CMakeFiles\test6.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
-  TARGET_FILE = bin\test6.exe
+  TARGET_FILE = test6.exe
   TARGET_IMPLIB = libtest6.dll.a
   TARGET_PDB = test6.exe.dbg
 
@@ -276,29 +283,17 @@ build rebuild_cache: phony CMakeFiles/rebuild_cache.util
 # =============================================================================
 # Target aliases.
 
-build test1: phony bin/test1.exe
+build test1: phony test1.exe
 
-build test1.exe: phony bin/test1.exe
+build test2: phony test2.exe
 
-build test2: phony bin/test2.exe
+build test3: phony test3.exe
 
-build test2.exe: phony bin/test2.exe
+build test4: phony test4.exe
 
-build test3: phony bin/test3.exe
+build test5: phony test5.exe
 
-build test3.exe: phony bin/test3.exe
-
-build test4: phony bin/test4.exe
-
-build test4.exe: phony bin/test4.exe
-
-build test5: phony bin/test5.exe
-
-build test5.exe: phony bin/test5.exe
-
-build test6: phony bin/test6.exe
-
-build test6.exe: phony bin/test6.exe
+build test6: phony test6.exe
 
 # =============================================================================
 # Folder targets.
@@ -308,7 +303,7 @@ build test6.exe: phony bin/test6.exe
 #############################################
 # Folder: D:/codes/ccodes/MY_PROJECT/Rubic's_Cube/cmake-build-debug
 
-build all: phony bin/test1.exe bin/test2.exe bin/test3.exe bin/test4.exe bin/test5.exe bin/test6.exe
+build all: phony test1.exe test2.exe test3.exe test4.exe test5.exe test6.exe
 
 # =============================================================================
 # Built-in targets

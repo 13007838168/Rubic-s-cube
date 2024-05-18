@@ -6,10 +6,9 @@ include_directories("D:/software/SDL2/mingw(CLion+VSC)/SDL2-2.26.0-allinone/x86_
         include)
 link_directories("D:/software/SDL2/mingw(CLion+VSC)/SDL2-2.26.0-allinone/x86_64-w64-mingw32/lib"
         lib/x64)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
 add_executable(test1 test1.c )
 add_executable(test2 test2.c)
-add_executable(test3 test3.c test3_head.h)
+add_executable(test3 test3.c test3_main.c test3_head.h)
 add_executable(test4 test4.c)
 add_executable(test5 test5.c )
 add_executable(test6 test6.c )
