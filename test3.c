@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-
+#include<setjmp.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 #include <time.h>
@@ -260,9 +260,38 @@ int ins_set4[10][20] = {
         {Mc,  B2c, Mu,  B2c},
         {z2c}
 };
-int mouse_flag = 0, x_pos, y_pos, del_x = 0, del_y = 0;
-
-void handle();
+int mouse_ins[28][4] = {
+        {Lu,  Bu,  Lc,  Bc},
+        {Mu,  Bu,  Mc,  Bc},
+        {Rc,  Bu,  Ru,  Bc},
+        {Lu,  Sc,  Lc,  Su},
+        {Mu,  Sc,  Mc,  Su},
+        {Rc,  Sc,  Ru,  Su},
+        {Lu,  Fc,  Lc,  Fu},
+        {Mu,  Fc,  Mc,  Fu},
+        {Rc,  Fc,  Ru,  Fu},
+        {Lu,  Uu,  Lc,  Uc},
+        {Mu,  Uu,  Mc,  Uc},
+        {Rc,  Uu,  Ru,  Uc},
+        {Lu,  Ec,  Lc,  Eu},
+        {Mu,  Ec,  Mc,  Eu},
+        {Rc,  Uu,  Ru,  Ec},
+        {Lu,  Dc,  Lc,  Du},
+        {Mu,  Dc,  Mc,  Du},
+        {Rc,  Dc,  Ru,  Du},
+        {Fu,  Uu,  Fc,  Uc},
+        {Su,  Uu,  Sc,  Uc},
+        {Bc,  Uu,  Bu,  Uc},
+        {Fu,  Ec,  Fc,  Eu},
+        {Su,  Ec,  Sc,  Eu},
+        {Bc,  Ec,  Bu,  Eu},
+        {Fu,  Dc,  Fc,  Du},
+        {Su,  Dc,  Sc,  Du},
+        {Bc,  Dc,  Bu,  Du},
+        {x2c, y2u, x2u, y2c},
+};
+int mouse_flag = 0, x_pos, y_pos, x_rel = 0, y_rel = 0, faceAndPos;
+int ins_flag = 1;
 
 void change_num(int *ptr[], int flag) {
     switch (flag) {
@@ -821,6 +850,8 @@ void draw(int flag, double angle) {
 }
 
 void draw_cube(int flag) {
+    if(flag)
+    ins_flag = 0;
     int angle = ins_vector[flag][1];
     int sig = angle >= 0 ? 1 : -1;
     for (double f = 0; f < abs(angle); f = f + 1.0)
@@ -832,6 +863,8 @@ void draw_cube(int flag) {
         printf("\n");
     }*/
     draw(0, 0);
+    if(flag)
+    ins_flag = 1;
 }
 
 void exe_line(int *ptr) {
@@ -1050,26 +1083,48 @@ int get_pos(int x, int y) {
     double dd = len1 * 1.0 / len2;
     if (y >= ori_y_pos - 3 * len1 && y <= ori_y_pos && dd * (x_pos - ori_x_pos) + y >= ori_y_pos &&
         dd * (x - 3 * len1 - ori_x_pos) + y <= ori_y_pos) {
-        printf("yellow\n");
         double del_x = x - (ori_x_pos + 3 * len2);
         double del_y = y - (ori_y_pos - 3 * len1);
-        int y1 = del_y / 110;
-        int x1 = (del_x + del_y * 78 / 110) / 110;
+        int y1 = del_y / len1;
+        int x1 = (del_x + del_y * len2 / len1) / len1;
         return x1 + 3 * y1;
     } else if (y >= ori_y_pos && y <= ori_y_pos + 3 * len1 && y - dd * (x - ori_x_pos) <= ori_y_pos &&
                y - dd * (x - 3 * len1 - ori_x_pos) >= ori_y_pos) {
-        printf("blue\n");
         double del_x = x - (ori_x_pos);
         double del_y = y - (ori_y_pos);
-        int y1 = del_y / 110;
-        int x1 = (del_x - del_y * 78 / 110) / 110;
-        printf("%d\n", x1 + 3 * y1);
-        return x1 + 3 * y1;
-    } else if (y + dd * (x - ori_x_pos - 3 * len1) >= 400 && y - dd * (x - ori_x_pos - 3 * len1) <= 400 &&
-               y + dd * (x - ori_x_pos - 3 * len1 - 6 * len2) <= 400 &&
-               y - dd * (x - ori_x_pos - 3 * len1 - 6 * len2) >= 400) {
-        printf("red\n");
+        int y1 = del_y / len1;
+        int x1 = (del_x - del_y * len2 / len1) / len1;
+        return x1 + 3 * y1 + 9;
+    } else if (y + dd * (x - ori_x_pos - 3 * len1) >= ori_y_pos && y - dd * (x - ori_x_pos - 3 * len1) <= ori_y_pos &&
+               y + dd * (x - ori_x_pos - 3 * len1 - 6 * len2) <= ori_y_pos &&
+               y - dd * (x - ori_x_pos - 3 * len1 - 6 * len2) >= ori_y_pos) {
+        double del_x = x - (ori_x_pos + 3 * len1);
+        double del_y = y - (ori_y_pos);
+        int y1 = (del_x / 78 + del_y / 110) / 2;
+        int x1 = (del_x / 78 - del_y / 110) / 2;
+        return x1 + 3 * y1 + 18;
     }
+    return 27;
+}
+
+void exe_vector(int x, int y, int flag) {
+    int face = flag / 9;
+    int ori_x_pos = 0, ori_y_pos = 400, len1 = 110, len2 = 78;
+    int arr[4][4] = {
+            {3 * len1, 3 * (len1 + len2), 3 * len1, 3 * (len2 - len1)},
+            {3 * len1, 3 * (len1 - len2), 3 * len1, -3 * (len1 + len2)},
+            {1,        0,                 0,        -1},
+            {1,        1,                 1,        -1},
+    };
+    int dir1 = arr[face][0] * x + arr[face][1] * y, dir2 = arr[face][2] * x + arr[face][3] * y;
+    if (dir1 <= 0 && dir2 >= 0)
+        draw_cube(mouse_ins[flag][0]);
+    else if (dir1 >= 0 && dir2 >= 0)
+        draw_cube(mouse_ins[flag][1]);
+    else if (dir1 >= 0 && dir2 <= 0)
+        draw_cube(mouse_ins[flag][2]);
+    else if (dir1 <= 0 && dir2 <= 0)
+        draw_cube(mouse_ins[flag][3]);
 }
 
 void handle() {
@@ -1085,12 +1140,11 @@ void handle() {
             switch (ev.type) {
                 case SDL_MOUSEBUTTONDOWN: {
                     if (ev.button.button == SDL_BUTTON_LEFT) {
-
                         mouse_flag = 1;
-                        del_x = del_y = 0;
+                        x_rel = y_rel = 0;
                         x_pos = ev.button.x;
                         y_pos = ev.button.y;
-                        get_pos(x_pos, y_pos);
+                        faceAndPos = get_pos(x_pos, y_pos);
                         printf("%d %d\n", x_pos, y_pos);
                     }
                     break;
@@ -1102,13 +1156,15 @@ void handle() {
                 }
                 case SDL_MOUSEMOTION: {
                     if (ev.button.button == SDL_BUTTON_LEFT && mouse_flag == 1) {
-                        del_x += ev.motion.xrel;
-                        del_y += ev.motion.yrel;
-                        //printf("%d %d\n",del_x,del_y);
-                        if (del_x > 50 || del_y > 50) {
+                        x_rel += ev.motion.xrel;
+                        y_rel += ev.motion.yrel;
+                        if (abs(x_rel) > 50 || abs(y_rel) > 50) {
                             mouse_flag = 0;
-                            if (del_x > del_y)
-                                draw_cube(Rc);
+                            if (ins_flag) {
+                                printf("%d %d\n", x_rel, y_rel);
+
+                                exe_vector(x_rel, y_rel, faceAndPos);
+                            }
                         }
                     }
                     break;
@@ -1118,6 +1174,7 @@ void handle() {
         }
     }
 };
+
 
 void init() {
     int x = 1, y = 1, z = 1;

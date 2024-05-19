@@ -44,7 +44,7 @@ main(int argc, char *argv[]) {
     window1 = SDL_CreateWindow
             (
                     "SDL AR Example",
-                    SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+                    600, SDL_WINDOWPOS_UNDEFINED,
                     800, 800,
                     SDL_WINDOW_OPENGL
             );
@@ -53,7 +53,7 @@ main(int argc, char *argv[]) {
         return 1;
     }
 
-  init();
+    init();
 
     //creating new context
     ctx = SDL_GL_CreateContext(window1);
@@ -87,15 +87,7 @@ main(int argc, char *argv[]) {
     while (!done) {
         /* Check for events */
         ++frames;
-        SDL_Event ev;
-        while (SDL_PollEvent(&ev)) {
-            if ((SDL_QUIT == ev.type) ||
-                (SDL_KEYDOWN == ev.type && SDLK_ESCAPE == ev.key.keysym.sym)) {
-                SDL_Quit();
-                done = 1;
-                break;
-            }
-        }
+        handle();
         int w, h;
         SDL_GL_MakeCurrent(window1, ctx);
         SDL_GetWindowSize(window1, &w, &h);
