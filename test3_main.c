@@ -49,10 +49,20 @@ main(int argc, char *argv[]) {
                     SDL_WINDOW_OPENGL
             );
     if (window1 == NULL) {
-        printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
+        printf("Window1 could not be created! SDL_Error: %s\n", SDL_GetError());
         return 1;
     }
-
+    window2 = SDL_CreateWindow
+            (
+                    "SDL AR Example",
+                    0, SDL_WINDOWPOS_UNDEFINED,
+                    600, 800,
+                    SDL_WINDOW_SHOWN
+            );
+    if (window2 == NULL) {
+        printf("Window2 could not be created! SDL_Error: %s\n", SDL_GetError());
+        return 1;
+    }
     init();
 
     //creating new context
@@ -82,17 +92,18 @@ main(int argc, char *argv[]) {
     // 设置随机种子
 
 
-
+    int w, h;
+    SDL_GL_MakeCurrent(window1, ctx);
+    SDL_GetWindowSize(window1, &w, &h);
+    glViewport(0, 0, w, h);
 
     while (!done) {
         /* Check for events */
         ++frames;
         handle();
-        int w, h;
-        SDL_GL_MakeCurrent(window1, ctx);
-        SDL_GetWindowSize(window1, &w, &h);
-        glViewport(0, 0, w, h);
+
         draw_cube(0);
+        draw_window();
 //int arr[18]={Ru,  Du, Rc, Du, Lc, Bu,  Lu,  Bc, D2c, Fu, Rc, Fc,  Ru,  x2c, yc};
         //    exe_line(arr);
         /*  int i = Rc;
