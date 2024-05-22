@@ -48,5 +48,6 @@ int get_button_num(int x,int y);
 void empty();
 void reset();
 void random_cube();
-
+int get_block_num(int x,int y);
+void change_color(int faceAndPos,int color);
 #endif //RUBICSCUBE_TEST3_HEAD_H

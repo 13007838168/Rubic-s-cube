@@ -90,7 +90,7 @@ typedef struct button {
     void (*func1)(void);
 
 } Button;
-int button_num = 0, click_button, current_button, up_button;
+int button_num = 0, click_button, current_button, up_button, click_color_block, current_color_block, color_flag;
 Button button_arr[10];
 SDL_GLContext ctx;
 SDL_Window *window1;
@@ -98,24 +98,34 @@ SDL_Window *window2;
 SDL_Renderer *renderer;
 TTF_Font *font;
 double base_color[8][3] = {
-        {0.5, 0.5,   0.5},//grey
-        {1.0, 1.0,   0.0},//yellow
-        {0.0, 0.0,   1.0},//blue
-        {1.0, 0.0,   0.0},//red
-        {0.0, 1.0,   0.0},//green
-        {1.0, 0.565, 0.0},//orange
-        {1.0, 1.0,   1.0},//white
-        {0.862, 0.862,   0.862}//LightGrey
+        {0.5,   0.5,   0.5},//grey
+        {1.0,   1.0,   0.0},//yellow
+        {0.0,   0.0,   1.0},//blue
+        {1.0,   0.0,   0.0},//red
+        {0.0,   1.0,   0.0},//green
+        {1.0,   0.565, 0.0},//orange
+        {1.0,   1.0,   1.0},//white
+        {0.862, 0.862, 0.862}//LightGrey
 };
 int button_color[8][4] = {
         {128, 128, 128, 255},
-        {255, 255, 255, 255},
+        {255, 255, 0,   255},
         {0,   0,   255, 255},
         {255, 0,   0,   255},
         {0,   255, 0,   255},
         {255, 144, 0,   255},
         {255, 255, 255, 255},
         {0,   0,   0,   255}
+};
+int block_color[7][4] = {
+
+        {255, 255, 0,   255},
+        {0,   0,   255, 255},
+        {255, 0,   0,   255},
+        {0,   255, 0,   255},
+        {255, 144, 0,   255},
+        {255, 255, 255, 255},
+        {220, 220, 220, 255},
 };
 double base_cube[8][3] = {
         {0.5,  0.5,  -0.5},
@@ -317,6 +327,28 @@ int mouse_ins[28][4] = {
         {Su,  Dc,  Sc,  Du},
         {Bc,  Dc,  Bu,  Du},
         {x2c, y2u, x2u, y2c},
+};
+int ins_arr1[500];
+int ins_num = 0;
+
+void ins_arr1_add(int ins) {
+    if (ins_num == 500)
+        printf("Error: ins_arr1 is full\n");
+    else {
+        change_face(ins);
+        ins_arr1[ins_num++] = ins;
+    }
+}
+
+int color_block_w = 50, color_block_h = 50;
+int color_block[7][4] = {
+        {300, 60,},
+        {350, 60,},
+        {400, 60,},
+        {300, 110,},
+        {350, 110,},
+        {400, 110,},
+        {450, 110,},
 };
 int mouse_flag = 0, x_pos, y_pos, x_rel = 0, y_rel = 0, faceAndPos;
 int ins_flag = 1;
@@ -1176,16 +1208,19 @@ void handle() {
                         if (ev.button.button == SDL_BUTTON_LEFT) {
                             mouse_flag = 1;
                             x_rel = y_rel = 0;
-                            x_pos = ev.button.x;
-                            y_pos = ev.button.y;
+                            SDL_GetMouseState(&x_pos, &y_pos);
                             faceAndPos = get_pos(x_pos, y_pos);
                             printf("%d %d\n", x_pos, y_pos);
                         }
                         break;
                     }
                     case SDL_MOUSEBUTTONUP: {
-                        if (ev.button.button == SDL_BUTTON_LEFT)
+                        if (ev.button.button == SDL_BUTTON_LEFT) {
+                            SDL_GetMouseState(&x_pos, &y_pos);
+                            if (faceAndPos == get_pos(x_pos, y_pos))
+                                change_color(faceAndPos, color_flag);
                             mouse_flag = 0;
+                        }
                         break;
                     }
                     case SDL_MOUSEMOTION: {
@@ -1212,24 +1247,30 @@ void handle() {
 
                         SDL_GetMouseState(&x, &y);
                         click_button = get_button_num(x, y);
+                        click_color_block = get_block_num(x, y);
                         break;
                     }
                     case SDL_MOUSEBUTTONUP: {
                         SDL_GetMouseState(&x, &y);
-                        if (click_button == get_button_num(x, y));
-                        {
+                        if (click_button != -1 && click_button == get_button_num(x, y)) {
                             up_button = click_button;
                             click_button = -1;
                             draw_window();
-                            if( button_arr[up_button ].func1)
-                            button_arr[up_button ].func1();
+                            if (button_arr[up_button].func1)
+                                button_arr[up_button].func1();
+                        } else {
+                            if (click_color_block != -1 && click_color_block == get_block_num(x, y))
+                                color_flag = click_color_block + 1;
+                            else color_flag = -1;
                         }
                         click_button = -1;
+                        click_color_block = -1;
                         break;
                     }
                     case SDL_MOUSEMOTION: {
                         SDL_GetMouseState(&x, &y);
                         current_button = get_button_num(x, y);
+                        current_color_block = get_block_num(x, y);
                         if (current_button == -1)
                             up_button = -1;
                         break;
@@ -1249,7 +1290,7 @@ void empty() {
 void reset() {
     for (int i = 0; i < 6; i++)
         for (int j = 0; j < 9; j++)
-            faces[i][j] = i+1;
+            faces[i][j] = i + 1;
 }
 
 void random() {
@@ -1260,6 +1301,13 @@ void random() {
 
         randomNum = rand();
         change_face(randomNum % 72 + 1);
+    }
+}
+
+void change_color(int faceAndPos, int color) {
+    if (color != -1 && faceAndPos < 27) {
+        faces[faceAndPos / 9][faceAndPos % 9] = color;
+
     }
 }
 
@@ -1281,7 +1329,7 @@ void init() {
     create_button(60, 400, 120, 60, "Resolve", solve);
     create_button(60, 510, 120, 60, "Stop", NULL);
     create_button(60, 620, 120, 60, "Continue", NULL);
-    click_button = current_button = up_button = -1;
+    click_button = current_button = up_button = click_color_block = current_button = color_flag = -1;
     TTF_Init();
     font = TTF_OpenFont("C:\\Windows\\Fonts\\arial.ttf", 24);
 
@@ -1301,6 +1349,14 @@ int get_button_num(int x, int y) {
     for (int i = 0; i < button_num; i++)
         if (button_arr[i].x <= x && x <= button_arr[i].x + button_arr[i].w && button_arr[i].y <= y &&
             y <= button_arr[i].y + button_arr[i].h)
+            return i;
+    return -1;
+}
+
+int get_block_num(int x, int y) {
+    for (int i = 0; i < 7; i++)
+        if (color_block[i][0] <= x && x <= color_block[i][0] + color_block_w && color_block[i][1] <= y &&
+            y <= color_block[i][1] + color_block_h)
             return i;
     return -1;
 }
@@ -1343,6 +1399,19 @@ void draw_window() {
 
         SDL_FreeSurface(surfaceMessage);
         SDL_DestroyTexture(message);
+    }
+    for (int i = 0; i < 7; i++) {
+        if (i == click_color_block && i == current_color_block)
+            SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);//purple
+        else
+            SDL_SetRenderDrawColor(renderer, block_color[i][0], block_color[i][1], block_color[i][2],
+                                   block_color[i][3]);
+        SDL_Rect rect = {color_block[i][0], color_block[i][1], color_block_w, color_block_h};
+        SDL_RenderFillRect(renderer, &rect);
+
+        SDL_SetRenderDrawColor(renderer, button_color[Black][0], button_color[Black][1], button_color[Black][2],
+                               button_color[Black][3]);
+        SDL_RenderDrawRect(renderer, &rect);
     }
     SDL_SetRenderTarget(renderer, NULL);
 
