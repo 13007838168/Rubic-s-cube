@@ -9,6 +9,7 @@
 #include <SDL_ttf.h>
 #include "test3_head.h"
 
+#define OFFSET 0x100
 typedef enum ins {
     Rc = 1,
     Ru = 2,
@@ -92,6 +93,8 @@ typedef struct button {
 } Button;
 int button_num = 0, click_button, current_button, up_button, click_color_block, current_color_block, color_flag;
 Button button_arr[10];
+int stack_size = 500, stack_pos = 0;
+int *stack;
 SDL_GLContext ctx;
 SDL_Window *window1;
 SDL_Window *window2;
@@ -331,12 +334,45 @@ int mouse_ins[28][4] = {
 int ins_arr1[500];
 int ins_num = 0;
 
-void ins_arr1_add(int ins) {
+void push(int num) {
+    if (!num)
+        return;
+    if (stack_size == stack_pos) {
+        stack_size *= 2;
+        stack = realloc(stack, stack_size);
+    }
+    stack[stack_pos++] = num;
+}
+
+int pop() {
+    if (stack_pos > 0)
+        return stack[--stack_pos];
+    return 0;
+}
+
+void add_ins(int ins) {
     if (ins_num == 500)
         printf("Error: ins_arr1 is full\n");
-    else {
+    else if (ins) {
         change_face(ins);
-        ins_arr1[ins_num++] = ins;
+        if (ins_num > 0 && (ins - 1) / 4 == (ins_arr1[ins_num - 1] - 1) / 4) {
+            int last_ins = ins_arr1[ins_num - 1];
+            int base = (ins - 1) / 4 * 4, res1 = (ins - 1) % 4, res2 = (last_ins - 1) % 4;
+            if (res1 == 0 && res2 == 0)
+                ins_arr1[ins_num - 1] = base + 3;
+            else if (res1 == 1 && res2 == 1)
+                ins_arr1[ins_num - 1] = base + 4;
+            else if (res1 == 0 && res2 == 1 || res1 == 1 && res2 == 0 || res1 == 2 && res2 == 3 ||
+                     res1 == 3 && res2 == 2 || res1 == 2 && res2 == 2 || res1 == 3 && res2 == 3)
+                ins_arr1[--ins_num] = 0;
+            else if (res1 == 0 && res2 == 2 || res1 == 2 && res2 == 0 || res1 == 0 && res2 == 3 ||
+                     res1 == 3 && res2 == 0)
+                ins_arr1[ins_num - 1] = base + 2;
+            else if (res1 == 1 && res2 == 2 || res1 == 2 && res2 == 1 || res1 == 1 && res2 == 3 ||
+                     res1 == 3 && res2 == 1)
+                ins_arr1[ins_num - 1] = base + 1;
+        } else
+            ins_arr1[ins_num++] = ins;
     }
 }
 
@@ -350,7 +386,7 @@ int color_block[7][4] = {
         {400, 110,},
         {450, 110,},
 };
-int mouse_flag = 0, x_pos, y_pos, x_rel = 0, y_rel = 0, faceAndPos;
+int mouse_flag = 0, x_pos, y_pos, x_rel = 0, y_rel = 0, facePos;
 int ins_flag = 1;
 
 void change_num(int *ptr[], int flag) {
@@ -923,6 +959,7 @@ void draw_cube(int flag) {
         printf("\n");
     }*/
     draw(0, 0);
+    push(flag);
     if (flag)
         ins_flag = 1;
 }
@@ -934,6 +971,13 @@ void exe_line(int *ptr) {
     }
 }
 
+void add_line(int *ptr) {
+    while (*ptr != 0) {
+        add_ins(*ptr);
+        ptr++;
+    }
+}
+
 void change_line(int *ptr) {
     while (*ptr != 0) {
         change_face(*ptr);
@@ -941,12 +985,37 @@ void change_line(int *ptr) {
     }
 }
 
+void copy_face(int face1[6][9], const int face2[6][9]) {
+    for (int i = 0; i < 6; i++)
+        for (int j = 0; j < 9; j++)
+            face1[i][j] = face2[i][j];
+}
+
 void solve() {
+    int temp_face[6][9], solvable = 0;
+    copy_face(temp_face, faces);
     for (int i = 0; i < 6; i++)
         if (faces[i][4] == White) {
-            draw_cube(ins_set1[i]);
+            add_ins(ins_set1[i]);
+            solvable = 1;
             break;
         }
+    if (!(solvable && faces[5][4] == Yellow)) {
+        solvable = 0;
+        goto end;
+    }
+
+    solvable = 0;
+    for (int i = 0; i < 4; i++) {
+        if (faces[i % 4 + 1][4] == Orange && faces[(i + 1) % 4 + 1][4] == Green && faces[(i + 2) % 4 + 1][4] == Red &&
+            faces[(i + 3) % 4 + 1][4] == Blue) {
+            solvable = 1;
+            break;
+        }
+    }
+    if (!solvable)
+        goto end;
+    solvable = 0;
     int arr[4][2];
     //if (faces[0][0] != White || faces[0][2] != White || faces[0][6] != White || faces[0][8] != White)
     for (int count = 0; count < 4; count++) {
@@ -956,15 +1025,20 @@ void solve() {
                     int color1 = faces[neighbor_vector[i][j][0]][neighbor_vector[i][j][1]], color2 = faces[neighbor_vector[i][j][2]][neighbor_vector[i][j][3]];
                     if (color1 == faces[3][4] && color2 == faces[4][4] ||
                         color2 == faces[3][4] && color1 == faces[4][4]) {
-                        exe_line(ins_set2[i][j]);
+                        add_line(ins_set2[i][j]);
                         arr[count][0] = i, arr[count][1] = j;
                         if (faces[3][4] != faces[3][2] || faces[4][4] != faces[4][0])
                             printf("%d %d\n", i, j);
+                        solvable++;
                     }
                 }
             }
         }
-        draw_cube(yc);
+        add_ins(yc);
+    }
+    if (solvable != 4) {
+        solvable = 0;
+        goto end;
     }
     if (faces[0][0] != faces[0][2] || faces[0][2] != faces[0][6] || faces[0][6] != faces[0][8] ||
         faces[0][8] != faces[0][0]) {
@@ -972,87 +1046,92 @@ void solve() {
         for (int i = 0; i < 4; i++)
             printf("%d %d ", arr[i][0], arr[i][1]);
         while (1)
-            draw_cube(yc);
+            add_ins(yc);
     }
-    draw_cube(x2u);
-
+    add_ins(x2u);
+    solvable = 4;
     int flag = 0;
     // if (faces[0][0] != faces[0][2] || faces[0][2] != faces[0][6] || faces[0][6] != faces[0][8])
     while (flag == 0) {
         for (int i = 0; i < 4; i++) {
             if (faces[0][0] == faces[0][8] && faces[0][8] == faces[1][0] && faces[1][0] == faces[2][2]) {
                 if (faces[1][2] == faces[4][0]) {
-                    exe_line(ins_set3[0]);
+                    add_line(ins_set3[0]);
                     break;
                 } else if (faces[0][2] != faces[1][2]) {
-                    draw_cube(y2c);
-                    exe_line(ins_set3[7]);
-                    exe_line(ins_set3[7]);
-                    exe_line(ins_set3[7]);
+                    add_ins(y2c);
+                    add_line(ins_set3[7]);
+                    add_line(ins_set3[7]);
+                    add_line(ins_set3[7]);
                 } else {
-
-                    exe_line(ins_set3[1]);
-
+                    add_line(ins_set3[1]);
                     break;
                 }
             } else if (faces[0][0] == faces[0][2] && faces[0][2] == faces[0][6] && faces[0][6] == faces[0][8]) {
                 if (faces[1][0] != faces[1][2] && faces[3][0] == faces[3][2] ||
                     faces[1][0] != faces[1][2] && faces[2][0] != faces[2][2] && faces[3][0] != faces[3][2] &&
                     faces[4][0] != faces[4][2]) {
-                    exe_line(ins_set3[2]);
+                    add_line(ins_set3[2]);
                     break;
                 } else if (faces[1][0] == faces[1][2] && faces[2][0] == faces[2][2]) {
                     flag = 1;
                     break;
                 }
             } else if (faces[0][8] == faces[2][2] && faces[2][2] == faces[3][2] && faces[3][2] == faces[4][2]) {
-                exe_line(ins_set3[3]);
+                add_line(ins_set3[3]);
                 break;
             } else if (faces[0][6] == faces[0][8] && faces[0][8] == faces[2][2] && faces[2][2] == faces[4][0]) {
-                exe_line(ins_set3[4]);
+                add_line(ins_set3[4]);
                 break;
             } else if (faces[0][2] == faces[1][0] && faces[1][0] == faces[2][0] && faces[2][0] == faces[4][0]) {
                 if (faces[0][8] == faces[3][2]) {
                     if (faces[1][2] != faces[2][2]) {
-                        exe_line(ins_set3[8]);
+                        add_line(ins_set3[8]);
                         break;
                     } else {
-                        exe_line(ins_set3[9]);
+                        add_line(ins_set3[9]);
                         break;
                     }
                 } else {
-                    exe_line(ins_set3[5]);
+                    add_line(ins_set3[5]);
                     break;
                 }
             } else if (faces[2][0] == faces[2][2] && faces[2][2] == faces[4][0] && faces[4][0] == faces[4][2] &&
                        faces[0][6] == faces[0][8]) {
-                exe_line(ins_set3[6]);
+                add_line(ins_set3[6]);
                 break;
             } else if (faces[0][0] == faces[0][2] && faces[0][2] == faces[1][0] && faces[1][0] == faces[1][2]) {
-                exe_line(ins_set3[7]);
+                add_line(ins_set3[7]);
                 break;
             } else if (faces[1][2] == faces[4][2] && faces[4][2] == faces[4][0] && faces[4][0] == faces[3][0]) {
-                exe_line(ins_set3[7]);
+                add_line(ins_set3[7]);
                 break;
             } else if (faces[1][0] == faces[1][2] && faces[1][2] == faces[3][0] && faces[3][0] == faces[3][2]) {
-                exe_line(ins_set3[7]);
+                add_line(ins_set3[7]);
                 break;
-            }
-            draw_cube(yc);
+            } else if (solvable == 0) {
+                flag = 1;
+                break;
+            } else
+                solvable--;
+            add_ins(yc);
         }
     }
-
+    if (!solvable)
+        goto end;
     if (faces[0][0] != faces[0][2] || faces[0][2] != faces[0][6] || faces[0][6] != faces[0][8] ||
         faces[0][8] != faces[0][0])
         printf("error5\n");
     while (1) {
+        solvable = 0;
         for (int count = 0; count < 4; count++) {
             for (int i = 0; i < 6; i++) {
                 for (int j = 0; j < 9; j++) {
                     if (faces[i][j] == faces[0][4] && neighbor_vector[i][j][2] == -1 &&
                         faces[neighbor_vector[i][j][0]][neighbor_vector[i][j][1]] == faces[3][0]) {
-                        exe_line(ins_set2[i][j]);
+                        add_line(ins_set2[i][j]);
                         arr[count][0] = i, arr[count][1] = j;
+                        solvable++;
                         if (faces[3][0] != faces[3][1])
                             printf("error2 %d %d\n", i, j);
                         if (faces[0][0] != faces[0][2] || faces[0][2] != faces[0][6] ||
@@ -1063,13 +1142,17 @@ void solve() {
                 }
             }
             if (count == 0 || count == 2)
-                draw_cube(y2c);
+                add_ins(y2c);
             else if (count == 1) {
                 if (faces[4][1] == faces[0][4])
-                    draw_cube(yc);
-                else draw_cube(yu);
+                    add_ins(yc);
+                else add_ins(yu);
             }
 
+        }
+        if (solvable != 4) {
+            solvable = 0;
+            goto end;
         }
         if (faces[5][1] == faces[5][3] && faces[5][3] == faces[5][5] && faces[5][5] == faces[5][7] &&
             faces[1][6] == faces[1][7] && faces[2][6] == faces[2][7] && faces[3][6] == faces[3][7])
@@ -1082,8 +1165,8 @@ void solve() {
             }
         }
         //printf("%d\n", pos);
-        draw_cube(ins_arr[pos]);
-        draw_cube(x2u);
+        add_ins(ins_arr[pos]);
+        add_ins(x2u);
     }
 
     if (!(faces[0][1] == faces[0][3] && faces[0][3] == faces[0][5] && faces[0][5] == faces[0][7] &&
@@ -1091,51 +1174,58 @@ void solve() {
           faces[5][1] == faces[5][3] && faces[5][3] == faces[5][5] && faces[5][5] == faces[5][7] &&
           faces[1][6] == faces[1][7] && faces[2][6] == faces[2][7] && faces[3][6] == faces[3][7]))
         printf("error6\n");
-    draw_cube(zu);
+    add_ins(zu);
     while (faces[0][0] != 2)
-        draw_cube(Lc);
+        add_ins(Lc);
     while (faces[0][4] != 2)
-        draw_cube(Mc);
+        add_ins(Mc);
     while (faces[0][2] != 2)
-        draw_cube(Ru);
+        add_ins(Ru);
     for (int i = 0; i < 4; i++) {
         int dif1 = abs(faces[0][1] - faces[0][4]);
         if (dif1 != 2 && dif1 != 0) {
             int dif2 = abs(faces[1][1] - faces[1][4]), dif3 = abs(faces[3][4] - faces[3][7]);
             if (dif2 != 2 && dif2 != 0)
-                exe_line(ins_set4[0]);
+                add_line(ins_set4[0]);
             else if (dif3 == 2 || dif3 == 0) {
-                draw_cube(F2c);
-                exe_line(ins_set4[0]);
-                draw_cube(F2c);
+                add_ins(F2c);
+                add_line(ins_set4[0]);
+                add_ins(F2c);
                 break;
             }
         }
-        draw_cube(xu);
+        add_ins(xu);
     }
     for (int i = 0; i < 4; i++) {
         if (faces[0][1] != faces[0][4] && faces[0][4] != faces[0][7]) {
-            exe_line(ins_set4[1]);
+            add_line(ins_set4[1]);
         } else if (faces[0][1] != faces[0][4] && faces[5][1] == faces[0][4] && faces[1][7] == faces[3][4]) {
-            exe_line(ins_set4[2]);
+            add_line(ins_set4[2]);
             break;
         } else if (faces[0][7] != faces[0][4] && faces[5][7] == faces[0][4] && faces[3][7] == faces[1][4]) {
-            draw_cube(y2c);
-            exe_line(ins_set4[2]);
+            add_ins(y2c);
+            add_line(ins_set4[2]);
             break;
         }
-        draw_cube(xu);
+        add_ins(xu);
     }
-    for (int i = 0; i < 4; i++) {
-        if (faces[0][1] != faces[0][4] || faces[0][3] != faces[0][4] || faces[0][5] != faces[0][4] ||
-            faces[0][7] != faces[0][4]) {
-            printf("error9\n");
-            while (1)
-                draw_cube(yc);
-            break;
-        }
-        draw_cube(yc);
+    if (faces[0][1] != faces[0][4] || faces[0][7] != faces[0][4] || faces[1][1] != faces[1][4] ||
+        faces[1][7] != faces[1][4] || faces[3][1] != faces[3][4] || faces[3][7] != faces[3][4] ||
+        faces[5][1] != faces[5][4] || faces[5][7] != faces[5][4]) {
+        solvable = 0;
+        goto end;
     }
+
+    end:
+    copy_face(faces, temp_face);
+    update_face();
+    if (solvable)
+        exe_line(ins_arr1);
+    else printf("can not solve!\n");
+    memset(ins_arr1, 0, sizeof(int));
+    ins_num = 0;
+    //todo: 2 interruption
+    //todo: 3 text input and output
 }
 
 int get_pos(int x, int y) {
@@ -1200,6 +1290,7 @@ void handle() {
                 SDL_DestroyWindow(window1);
                 SDL_DestroyWindow(window2);
                 SDL_Quit();
+                free(stack);
                 exit(0);
             }
             if (ev.window.windowID == SDL_GetWindowID(window1)) {
@@ -1209,16 +1300,15 @@ void handle() {
                             mouse_flag = 1;
                             x_rel = y_rel = 0;
                             SDL_GetMouseState(&x_pos, &y_pos);
-                            faceAndPos = get_pos(x_pos, y_pos);
-                            printf("%d %d\n", x_pos, y_pos);
+                            facePos = get_pos(x_pos, y_pos);
                         }
                         break;
                     }
                     case SDL_MOUSEBUTTONUP: {
                         if (ev.button.button == SDL_BUTTON_LEFT) {
                             SDL_GetMouseState(&x_pos, &y_pos);
-                            if (faceAndPos == get_pos(x_pos, y_pos))
-                                change_color(faceAndPos, color_flag);
+                            if (facePos == get_pos(x_pos, y_pos))
+                                change_color(facePos, color_flag);
                             mouse_flag = 0;
                         }
                         break;
@@ -1230,9 +1320,7 @@ void handle() {
                             if (abs(x_rel) > 50 || abs(y_rel) > 50) {
                                 mouse_flag = 0;
                                 if (ins_flag) {
-                                    printf("%d %d\n", x_rel, y_rel);
-
-                                    exe_vector(x_rel, y_rel, faceAndPos);
+                                    exe_vector(x_rel, y_rel, facePos);
                                 }
                             }
                         }
@@ -1244,7 +1332,6 @@ void handle() {
                 int x, y;
                 switch (ev.type) {
                     case SDL_MOUSEBUTTONDOWN: {
-
                         SDL_GetMouseState(&x, &y);
                         click_button = get_button_num(x, y);
                         click_color_block = get_block_num(x, y);
@@ -1276,6 +1363,7 @@ void handle() {
                         break;
                     }
                 }
+                draw_window();
             }
         }
     }
@@ -1285,12 +1373,14 @@ void empty() {
     for (int i = 0; i < 6; i++)
         for (int j = 0; j < 9; j++)
             faces[i][j] = 7;
+    stack_pos = 0;
 }
 
 void reset() {
     for (int i = 0; i < 6; i++)
         for (int j = 0; j < 9; j++)
             faces[i][j] = i + 1;
+    stack_pos = 0;
 }
 
 void random() {
@@ -1302,12 +1392,28 @@ void random() {
         randomNum = rand();
         change_face(randomNum % 72 + 1);
     }
+    stack_pos = 0;
 }
 
 void change_color(int faceAndPos, int color) {
     if (color != -1 && faceAndPos < 27) {
+        push(OFFSET + (facePos << 3) + faces[facePos / 9][facePos % 9]);
         faces[faceAndPos / 9][faceAndPos % 9] = color;
+    }
+}
 
+void back() {
+    int ins = pop();
+    if (ins >= OFFSET) {
+        ins -= OFFSET;
+        int face_pos = ins / 8, color = ins % 8;
+        faces[face_pos / 9][face_pos % 9] = color;
+    } else if (ins) {
+        if (ins % 2 == 0)
+            draw_cube(ins - 1);
+        else
+            draw_cube(ins + 1);
+        stack_pos--;
     }
 }
 
@@ -1329,9 +1435,11 @@ void init() {
     create_button(60, 400, 120, 60, "Resolve", solve);
     create_button(60, 510, 120, 60, "Stop", NULL);
     create_button(60, 620, 120, 60, "Continue", NULL);
+    create_button(300, 180, 120, 60, "Back", back);
     click_button = current_button = up_button = click_color_block = current_button = color_flag = -1;
     TTF_Init();
     font = TTF_OpenFont("C:\\Windows\\Fonts\\arial.ttf", 24);
+    stack = malloc(stack_size * sizeof(int));
 
 }
 
