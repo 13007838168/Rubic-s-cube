@@ -38,7 +38,7 @@ void exe_line(int *ptr);
 void change_line(int *ptr);
 
 void solve();
-
+void exe_str(char * str);
 int get_pos(int x, int y);
 
 void create_button(int x, int y, int w, int h, char *str,void (*func1)(void));

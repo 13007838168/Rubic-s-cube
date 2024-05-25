@@ -1,7 +1,7 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include <stdbool.h>
-
+#include <stdio.h>
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
 
@@ -34,10 +34,10 @@ int main(int argc, char* argv[]) {
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
     // 加载字体
-    font = TTF_OpenFont("C:\\Windows\\Fonts\\arial.ttf", 24);
+    font = TTF_OpenFont("C:\\Windows\\Fonts\\STSONG.TTF", 24);
 
     // 初始化输入文本框
-    inputText = (char*)malloc(sizeof(char));
+    inputText = (char*)malloc(100*sizeof(char));
     inputText[0] = '\0';
 
     // 主循环
@@ -107,6 +107,7 @@ void handleEvent(SDL_Event* event) {
         running = false;
     }
     else if (event->type == SDL_TEXTINPUT) {
+        printf("%s\n",event->text.text);
         // 处理输入
         strcat(inputText, event->text.text);
     }

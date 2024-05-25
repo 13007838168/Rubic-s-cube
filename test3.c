@@ -7,9 +7,11 @@
 #include <SDL2/SDL_opengl.h>
 #include <time.h>
 #include <SDL_ttf.h>
+#include <SDL_image.h>
 #include "test3_head.h"
 
 #define OFFSET 0x100
+#define INS_ARR_SIZE 500
 typedef enum ins {
     Rc = 1,
     Ru = 2,
@@ -95,11 +97,17 @@ int button_num = 0, click_button, current_button, up_button, click_color_block, 
 Button button_arr[10];
 int stack_size = 500, stack_pos = 0;
 int *stack;
+char inputText[260] = "";
+char outputText[32] = "";
+int input_flag = 1;
 SDL_GLContext ctx;
 SDL_Window *window1;
 SDL_Window *window2;
 SDL_Renderer *renderer;
 TTF_Font *font;
+SDL_Surface *image;
+SDL_Texture *texture1;
+int *ins_arr2, ins_pos2 = 0, ins_size2 = 500;
 double base_color[8][3] = {
         {0.5,   0.5,   0.5},//grey
         {1.0,   1.0,   0.0},//yellow
@@ -273,12 +281,19 @@ int ins_set1[6] = {0,
                    zc,
                    x2c};
 int ins_set2[6][9][10] = {
-        {{},                                 {},                                      {Fu,  Uu, Fc,  Rc,},                 {Su,  Du,  Sc, Mc,  Bc, Mu, Bu}, {}, {Sc,  Dc,  Su, Mc,  Bc, Mu, Bu}, {Rc, Uc,  Ru, Fu},             {Mc,  Dc, Mu,  Dc, Mc, Bc, Mu, Bu}, {Bc, Rc,  Bu,  Dc, Lu, Du, Lc},},
-        {{Lu},                               {Sc,  Mu,  Su},                          {Fu,  Dc, Lu,  Du,  Fc},             {Eu,  Bu,  Mc, Bc,  Mu},         {}, {Ec,  Bc,  Mc, Bu,  Mu},         {Bc, Du,  Bu},                 {D2c, Mc, Bc,  Mu, Bu},             {Lu, D2c, Lc},},
-        {{Rc, Du, Bc,  Dc,  Ru},             {Rc,  Bc,  Mc, Bu,  Mu, Ru},             {Bc},                                {R2c, Bc,  Mc, Bu,  Mu, R2u},    {}, {Bc,  Mc,  Bu, Mu},              {Bc, D2c, Bu},                 {Ru,  Bc, Mc,  Bu, rc},             {Lu, Dc,  Lc},},
-        {{Fu, Rc, B2c, Fc},                  {Mc,  Bc,  Mu, Bu,  Ec, Bu, Mc, Bc, Mu}, {Lc,  Bu, Lu,  B2c, Dc, Bu},         {Ec,  Bu,  Mc, Bc,  Mu},         {}, {Eu,  Bc,  Mc, Bu,  Mu},         {Dc, Lu,  Du, Lc},             {Mc,  Bc, Mu,  Bu},                 {Bc, Dc,  Bu},},
-        {{Bu, Lc, Bc,  L2u, Du, Lc},         {Lu,  Bu,  Mc, Bc,  Mu, Lc},             {Rc,  Fu, L2c, Ru},                  {Bu,  Mc,  Bc, Mu},              {}, {L2u, Bu,  Mc, Bc,  Mu, L2c},    {Lu, Du,  Lc},                 {Lc,  Bu, Mc,  Bc, lu},             {Du, Bc,  Dc,  Bu},},
-        {{Du, Fc, L2c, Fu,  Du, Bc, Dc, Bu}, {D2c, B2c, Mc, B2u, Mu},                 {D2u, Fc, L2c, Fu,  Du, Bc, Dc, Bu}, {Du,  B2c, Mc, B2u, Mu},         {}, {Dc,  B2c, Mc, B2u, Mu},         {Fc, L2c, Fu, Du, Bc, Dc, Bu}, {B2c, Mc, B2u, Mu},                 {Dc, Fc,  L2c, Fu, Du, Bc, Dc, Bu},},
+        {{},                                 {},                                      {Fu,  Uu, Fc,  Rc,},         {Su,  Du,  Sc, Mc,  Bc, Mu, Bu}, {}, {Sc,  Dc,  Su, Mc,  Bc, Mu, Bu}, {Rc, Uc,  Ru, Fu},
+                                                                                                                                                                                                                        {Mc,  Dc, Mu,  Dc, Mc, Bc, Mu, Bu}, {Bc, Rc,  Bu,  Dc, Lu, Du, Lc},},
+        {{Lu},                               {Sc,  Mu,  Su},                          {Fu,  Dc, Lu,  Du,  Fc},     {Eu,  Bu,  Mc, Bc,  Mu},         {}, {Ec,  Bc,  Mc, Bu,  Mu},         {Bc, Du,  Bu},
+                                                                                                                                                                                                                        {D2c, Mc, Bc,  Mu, Bu},             {Lu, D2c, Lc},},
+        {{Rc, Du, Bc,  Dc,  Ru},             {Rc,  Bc,  Mc, Bu,  Mu, Ru},             {Bc},                        {R2c, Bc,  Mc, Bu,  Mu, R2u},    {}, {Bc,  Mc,  Bu, Mu},
+                                                                                                                                                                                         {Bc, D2c, Bu},                 {Ru,  Bc, Mc,  Bu, rc},             {Lu, Dc,  Lc},},
+        {{Fu, Rc, B2c, Fc},                  {Mc,  Bc,  Mu, Bu,  Ec, Bu, Mc, Bc, Mu}, {Lc,  Bu, Lu,  B2c, Dc, Bu}, {Ec,  Bu,  Mc, Bc,  Mu},         {},
+                                                                                                                                                        {Eu,  Bc,  Mc, Bu,  Mu},         {Dc, Lu,  Du, Lc},             {Mc,  Bc, Mu,  Bu},                 {Bc, Dc,  Bu},},
+        {{Bu, Lc, Bc,  L2u, Du, Lc},         {Lu,  Bu,  Mc, Bc,  Mu, Lc},             {Rc,  Fu, L2c, Ru},          {Bu,  Mc,  Bc, Mu},              {},
+                                                                                                                                                        {L2u, Bu,  Mc, Bc,  Mu, L2c},    {Lu, Du,  Lc},                 {Lc,  Bu, Mc,  Bc, lu},             {Du, Bc,  Dc,  Bu},},
+        {{Du, Fc, L2c, Fu,  Du, Bc, Dc, Bu}, {D2c, B2c, Mc, B2u, Mu},                 {D2u, Fc, L2c, Fu,  Du, Bc, Dc, Bu},
+                                                                                                                   {Du,  B2c, Mc, B2u, Mu},         {}, {Dc,  B2c, Mc, B2u, Mu},         {Fc, L2c, Fu, Du, Bc, Dc, Bu}, {B2c, Mc, B2u, Mu},
+                                                                                                                                                                                                                                                            {Dc, Fc,  L2c, Fu, Du, Bc, Dc, Bu},},
 
 };
 
@@ -331,7 +346,7 @@ int mouse_ins[28][4] = {
         {Bc,  Dc,  Bu,  Du},
         {x2c, y2u, x2u, y2c},
 };
-int ins_arr1[500];
+int ins_arr1[INS_ARR_SIZE];
 int ins_num = 0;
 
 void push(int num) {
@@ -341,7 +356,8 @@ void push(int num) {
         stack_size *= 2;
         stack = realloc(stack, stack_size);
     }
-    stack[stack_pos++] = num;
+    if (num < OFFSET || stack_pos == 0 || stack[stack_pos - 1] != num)
+        stack[stack_pos++] = num;
 }
 
 int pop() {
@@ -351,7 +367,7 @@ int pop() {
 }
 
 void add_ins(int ins) {
-    if (ins_num == 500)
+    if (ins_num == INS_ARR_SIZE)
         printf("Error: ins_arr1 is full\n");
     else if (ins) {
         change_face(ins);
@@ -387,7 +403,8 @@ int color_block[7][4] = {
         {450, 110,},
 };
 int mouse_flag = 0, x_pos, y_pos, x_rel = 0, y_rel = 0, facePos;
-int ins_flag = 1;
+int int_flag1 = 0, int_flag2 = 0, int_flag3 = 0;
+jmp_buf buf1, buf2;
 
 void change_num(int *ptr[], int flag) {
     switch (flag) {
@@ -947,7 +964,7 @@ void draw(int flag, double angle) {
 
 void draw_cube(int flag) {
     if (flag)
-        ins_flag = 0;
+        int_flag1 = 1;
     int angle = ins_vector[flag][1];
     int sig = angle >= 0 ? 1 : -1;
     for (double f = 0; f < abs(angle); f = f + 1.0)
@@ -961,7 +978,14 @@ void draw_cube(int flag) {
     draw(0, 0);
     push(flag);
     if (flag)
-        ins_flag = 1;
+        int_flag1 = 0;
+    if (int_flag3) {
+        int_flag2 = 2;
+        int_flag3 = 0;
+        if (!setjmp(buf1))
+            while (1)
+                handle();
+    }
 }
 
 void exe_line(int *ptr) {
@@ -992,6 +1016,13 @@ void copy_face(int face1[6][9], const int face2[6][9]) {
 }
 
 void solve() {
+    if (int_flag1 || int_flag2)
+        return;
+    int_flag2 = 1;
+    if (setjmp(buf2)) {
+        strcpy(button_arr[4].name, "Break");
+        goto end2;
+    }
     int temp_face[6][9], solvable = 0;
     copy_face(temp_face, faces);
     for (int i = 0; i < 6; i++)
@@ -1002,7 +1033,7 @@ void solve() {
         }
     if (!(solvable && faces[5][4] == Yellow)) {
         solvable = 0;
-        goto end;
+        goto end1;
     }
 
     solvable = 0;
@@ -1014,7 +1045,7 @@ void solve() {
         }
     }
     if (!solvable)
-        goto end;
+        goto end1;
     solvable = 0;
     int arr[4][2];
     //if (faces[0][0] != White || faces[0][2] != White || faces[0][6] != White || faces[0][8] != White)
@@ -1027,8 +1058,6 @@ void solve() {
                         color2 == faces[3][4] && color1 == faces[4][4]) {
                         add_line(ins_set2[i][j]);
                         arr[count][0] = i, arr[count][1] = j;
-                        if (faces[3][4] != faces[3][2] || faces[4][4] != faces[4][0])
-                            printf("%d %d\n", i, j);
                         solvable++;
                     }
                 }
@@ -1038,21 +1067,20 @@ void solve() {
     }
     if (solvable != 4) {
         solvable = 0;
-        goto end;
+        goto end1;
     }
-    if (faces[0][0] != faces[0][2] || faces[0][2] != faces[0][6] || faces[0][6] != faces[0][8] ||
-        faces[0][8] != faces[0][0]) {
-        printf("error1");
-        for (int i = 0; i < 4; i++)
-            printf("%d %d ", arr[i][0], arr[i][1]);
-        while (1)
-            add_ins(yc);
-    }
+    solvable = (faces[1][0] == faces[1][2] && faces[2][0] == faces[2][2] && faces[3][0] == faces[3][2] &&
+                faces[4][0] == faces[4][2]);
+    if (!solvable)
+        goto end1;
     add_ins(x2u);
-    solvable = 4;
     int flag = 0;
-    // if (faces[0][0] != faces[0][2] || faces[0][2] != faces[0][6] || faces[0][6] != faces[0][8])
     while (flag == 0) {
+        if (ins_num > 400) {
+            solvable = 0;
+            goto end1;
+        }
+        solvable = 4;
         for (int i = 0; i < 4; i++) {
             if (faces[0][0] == faces[0][8] && faces[0][8] == faces[1][0] && faces[1][0] == faces[2][2]) {
                 if (faces[1][2] == faces[4][0]) {
@@ -1109,19 +1137,17 @@ void solve() {
             } else if (faces[1][0] == faces[1][2] && faces[1][2] == faces[3][0] && faces[3][0] == faces[3][2]) {
                 add_line(ins_set3[7]);
                 break;
-            } else if (solvable == 0) {
+            }
+            solvable--;
+            if (solvable == 0) {
                 flag = 1;
                 break;
-            } else
-                solvable--;
+            }
             add_ins(yc);
         }
     }
     if (!solvable)
-        goto end;
-    if (faces[0][0] != faces[0][2] || faces[0][2] != faces[0][6] || faces[0][6] != faces[0][8] ||
-        faces[0][8] != faces[0][0])
-        printf("error5\n");
+        goto end1;
     while (1) {
         solvable = 0;
         for (int count = 0; count < 4; count++) {
@@ -1132,12 +1158,6 @@ void solve() {
                         add_line(ins_set2[i][j]);
                         arr[count][0] = i, arr[count][1] = j;
                         solvable++;
-                        if (faces[3][0] != faces[3][1])
-                            printf("error2 %d %d\n", i, j);
-                        if (faces[0][0] != faces[0][2] || faces[0][2] != faces[0][6] ||
-                            faces[0][6] != faces[0][8] ||
-                            faces[0][8] != faces[0][0])
-                            printf("error3 %d %d\n", i, j);
                     }
                 }
             }
@@ -1152,7 +1172,7 @@ void solve() {
         }
         if (solvable != 4) {
             solvable = 0;
-            goto end;
+            goto end1;
         }
         if (faces[5][1] == faces[5][3] && faces[5][3] == faces[5][5] && faces[5][5] == faces[5][7] &&
             faces[1][6] == faces[1][7] && faces[2][6] == faces[2][7] && faces[3][6] == faces[3][7])
@@ -1169,11 +1189,6 @@ void solve() {
         add_ins(x2u);
     }
 
-    if (!(faces[0][1] == faces[0][3] && faces[0][3] == faces[0][5] && faces[0][5] == faces[0][7] &&
-          faces[1][0] == faces[1][1] && faces[2][0] == faces[2][1] && faces[3][0] == faces[3][1] &&
-          faces[5][1] == faces[5][3] && faces[5][3] == faces[5][5] && faces[5][5] == faces[5][7] &&
-          faces[1][6] == faces[1][7] && faces[2][6] == faces[2][7] && faces[3][6] == faces[3][7]))
-        printf("error6\n");
     add_ins(zu);
     while (faces[0][0] != 2)
         add_ins(Lc);
@@ -1213,19 +1228,20 @@ void solve() {
         faces[1][7] != faces[1][4] || faces[3][1] != faces[3][4] || faces[3][7] != faces[3][4] ||
         faces[5][1] != faces[5][4] || faces[5][7] != faces[5][4]) {
         solvable = 0;
-        goto end;
+        goto end1;
     }
 
-    end:
+    end1:
     copy_face(faces, temp_face);
     update_face();
-    if (solvable)
+    if (solvable) {
+        strcpy(outputText, "");
         exe_line(ins_arr1);
-    else printf("can not solve!\n");
-    memset(ins_arr1, 0, sizeof(int));
+    } else strcpy(outputText, "Error: Illegal cube!");
+    end2:
+    memset(ins_arr1, 0, sizeof(int) * INS_ARR_SIZE);
     ins_num = 0;
-    //todo: 2 interruption
-    //todo: 3 text input and output
+    int_flag2 = 0;
 }
 
 int get_pos(int x, int y) {
@@ -1258,6 +1274,8 @@ int get_pos(int x, int y) {
 }
 
 void exe_vector(int x, int y, int flag) {
+    if (int_flag1 || int_flag2)
+        return;
     int face = flag / 9;
     int ori_x_pos = 0, ori_y_pos = 400, len1 = 110, len2 = 78;
     int arr[4][4] = {
@@ -1283,14 +1301,17 @@ void handle() {
         while (SDL_PollEvent(&ev)) {
             if ((SDL_QUIT == ev.type) ||
                 (SDL_KEYDOWN == ev.type && SDLK_ESCAPE == ev.key.keysym.sym)) {
-
                 TTF_CloseFont(font);
+                SDL_FreeSurface(image);
+                SDL_DestroyTexture(texture1);
+                IMG_Quit();
                 TTF_Quit();
                 SDL_DestroyRenderer(renderer);
                 SDL_DestroyWindow(window1);
                 SDL_DestroyWindow(window2);
                 SDL_Quit();
                 free(stack);
+                free(ins_arr2);
                 exit(0);
             }
             if (ev.window.windowID == SDL_GetWindowID(window1)) {
@@ -1319,9 +1340,8 @@ void handle() {
                             y_rel += ev.motion.yrel;
                             if (abs(x_rel) > 50 || abs(y_rel) > 50) {
                                 mouse_flag = 0;
-                                if (ins_flag) {
-                                    exe_vector(x_rel, y_rel, facePos);
-                                }
+                                exe_vector(x_rel, y_rel, facePos);
+
                             }
                         }
                         break;
@@ -1362,6 +1382,54 @@ void handle() {
                             up_button = -1;
                         break;
                     }
+                    case SDL_TEXTINPUT: {
+                        if (input_flag) {
+                            if (strlen(inputText) > 256) {
+                                strcpy(outputText, "Error: The path is too long!");
+                            } else {
+                                strcat(inputText, ev.text.text);
+                                if (strcmp(outputText, "Error: The path is too long!") == 0)
+                                    strcpy(outputText, "");
+                            }
+                        }
+
+                        break;
+                    }
+                    case SDL_KEYDOWN: {
+                        if (ev.key.keysym.sym == SDLK_BACKSPACE && strlen(inputText) > 0 && input_flag) {
+                            {
+                                inputText[strlen(inputText) - 1] = '\0';
+                                if (strcmp(outputText, "Error: The path is too long!") == 0)
+                                    strcpy(outputText, "");
+                            }
+                        } else if (ev.key.keysym.sym == SDLK_TAB)
+                            input_flag = 1 - input_flag;
+                        else if (ev.key.keysym.sym == SDLK_RETURN || ev.key.keysym.sym == SDLK_KP_ENTER) {
+                            FILE *file = fopen(inputText, "r"); // 打开文件，以只读模式
+
+                            if (file)
+                                strcpy(outputText, "");
+                            else {
+                                strcpy(outputText, "Error: No such file!");
+                                return;
+                            }
+                            // 计算文件大小
+                            fseek(file, 0L, SEEK_END);
+                            long size = ftell(file);
+                            rewind(file); // 将文件指针重新定位到文件开头
+
+                            char *buffer = (char *) malloc(size + 1); // 为文件内容分配内存
+
+                            fread(buffer, size, 1, file); // 读取文件内容到缓冲区
+                            fclose(file);
+
+                            buffer[size] = '\0'; // 将缓冲区最后一个字符设置为 '\0'，以便将其作为 C 字符串使用
+                            exe_str(buffer);
+                            // printf("File contents:\n%s\n", buffer);
+                            free(buffer); // 释放内存
+
+                        }
+                    }
                 }
                 draw_window();
             }
@@ -1370,6 +1438,8 @@ void handle() {
 };
 
 void empty() {
+    if (int_flag1 || int_flag2)
+        return;
     for (int i = 0; i < 6; i++)
         for (int j = 0; j < 9; j++)
             faces[i][j] = 7;
@@ -1377,6 +1447,8 @@ void empty() {
 }
 
 void reset() {
+    if (int_flag1 || int_flag2)
+        return;
     for (int i = 0; i < 6; i++)
         for (int j = 0; j < 9; j++)
             faces[i][j] = i + 1;
@@ -1384,6 +1456,8 @@ void reset() {
 }
 
 void random() {
+    if (int_flag1 || int_flag2)
+        return;
     int randomNum;
     srand(time(NULL));
     //change_face(zu);
@@ -1396,6 +1470,8 @@ void random() {
 }
 
 void change_color(int faceAndPos, int color) {
+    if (int_flag1)
+        return;
     if (color != -1 && faceAndPos < 27) {
         push(OFFSET + (facePos << 3) + faces[facePos / 9][facePos % 9]);
         faces[faceAndPos / 9][faceAndPos % 9] = color;
@@ -1403,6 +1479,8 @@ void change_color(int faceAndPos, int color) {
 }
 
 void back() {
+    if (int_flag1 || int_flag2)
+        return;
     int ins = pop();
     if (ins >= OFFSET) {
         ins -= OFFSET;
@@ -1417,9 +1495,26 @@ void back() {
     }
 }
 
+void suspend_or_break() {
+    if (int_flag2 == 1) {
+        strcpy(button_arr[4].name, "Stop");
+        int_flag3 = 1;
+    }
+    else if (int_flag2 == 2)
+        longjmp(buf2, 1);
+}
+
+void continue_ins() {
+    if (int_flag2 == 2) {
+        int_flag2 = 1;
+        strcpy(button_arr[4].name, "Break");
+        longjmp(buf1, 1);
+    }
+}
+
 void init() {
     renderer = SDL_CreateRenderer(window2, -1, SDL_RENDERER_ACCELERATED);
-
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
     int x = 1, y = 1, z = 1;
     for (int i = 0; i < 3; i++)
         for (int j = 0; j < 3; j++)
@@ -1428,19 +1523,21 @@ void init() {
                 vector[9 * i + 3 * j + k][1] = y - j;
                 vector[9 * i + 3 * j + k][2] = z - k;
             }
-
     create_button(60, 70, 120, 60, "Empty", empty);
     create_button(60, 180, 120, 60, "Reset", reset);
     create_button(60, 290, 120, 60, "Random", random);
     create_button(60, 400, 120, 60, "Resolve", solve);
-    create_button(60, 510, 120, 60, "Stop", NULL);
-    create_button(60, 620, 120, 60, "Continue", NULL);
+    create_button(60, 510, 120, 60, "Break", suspend_or_break);
+    create_button(60, 620, 120, 60, "Continue", continue_ins);
     create_button(300, 180, 120, 60, "Back", back);
     click_button = current_button = up_button = click_color_block = current_button = color_flag = -1;
     TTF_Init();
-    font = TTF_OpenFont("C:\\Windows\\Fonts\\arial.ttf", 24);
+    font = TTF_OpenFont("constan.ttf", 24);
+    IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP);
+    image = IMG_Load("a.jpg");
+    texture1 = SDL_CreateTextureFromSurface(renderer, image);
     stack = malloc(stack_size * sizeof(int));
-
+    ins_arr2 = malloc(ins_size2 * sizeof(int));
 }
 
 void create_button(int x, int y, int w, int h, char *str, void (*func1)(void)) {
@@ -1469,11 +1566,186 @@ int get_block_num(int x, int y) {
     return -1;
 }
 
+void put_ins(int ins) {
+    if (!ins)
+        return;
+    if (ins_pos2 == ins_size2) {
+        ins_size2 *= 2;
+        ins_arr2 = realloc(ins_arr2, ins_size2);
+    }
+    ins_arr2[ins_pos2++] = ins;
+}
+
+void exe_str(char *str) {
+    if (int_flag1 || int_flag2)
+        return;
+    int_flag2 = 1;
+    if (setjmp(buf2)) {
+        strcpy(button_arr[4].name, "Break");
+        int_flag2 = 0;
+        return;
+    }
+    int flag = 0;
+    int ins = 0;
+    int match = 1;
+    while (*str) {
+        if (!match)
+            break;
+        switch (*str) {
+            case 'R': {
+                put_ins(ins);
+                ins = Rc;
+                flag = 1;
+                break;
+            }
+            case 'L': {
+                put_ins(ins);
+                ins = Lc;
+                flag = 1;
+                break;
+            }
+            case 'F': {
+                put_ins(ins);
+                ins = Fc;
+                flag = 1;
+                break;
+            }
+            case 'B': {
+                put_ins(ins);
+                ins = Bc;
+                flag = 1;
+                break;
+            }
+            case 'U': {
+                put_ins(ins);
+                ins = Uc;
+                flag = 1;
+                break;
+            }
+            case 'D': {
+                put_ins(ins);
+                ins = Dc;
+                flag = 1;
+                break;
+            }
+            case 'r': {
+                put_ins(ins);
+                ins = rc;
+                flag = 1;
+                break;
+            }
+            case 'l': {
+                put_ins(ins);
+                ins = lc;
+                flag = 1;
+                break;
+            }
+            case 'f': {
+                put_ins(ins);
+                ins = fc;
+                flag = 1;
+                break;
+            }
+            case 'b': {
+                put_ins(ins);
+                ins = bc;
+                flag = 1;
+                break;
+            }
+            case 'u': {
+                put_ins(ins);
+                ins = uc;
+                flag = 1;
+                break;
+            }
+            case 'd': {
+                put_ins(ins);
+                ins = dc;
+                flag = 1;
+                break;
+            }
+            case 'M': {
+                put_ins(ins);
+                ins = Mc;
+                flag = 1;
+                break;
+            }
+            case 'E': {
+                put_ins(ins);
+                ins = Ec;
+                flag = 1;
+                break;
+            }
+            case 'S': {
+                put_ins(ins);
+                ins = Sc;
+                flag = 1;
+                break;
+            }
+            case 'y': {
+                put_ins(ins);
+                ins = yc;
+                flag = 1;
+                break;
+            }
+            case 'x': {
+                put_ins(ins);
+                ins = xc;
+                flag = 1;
+                break;
+            }
+            case 'z': {
+                put_ins(ins);
+                ins = zc;
+                flag = 1;
+                break;
+            }
+            case '\'': {
+                if (flag == 1) {
+                    ins++;
+                    flag = 2;
+                } else
+                    match = 0;
+                break;
+            }
+            case '2': {
+                if (flag == 2) {
+                    ins += 2;
+                    flag = 0;
+                } else
+                    match = 0;
+                break;
+            }
+            case ' ': {
+            }
+            case '\t': {
+            }
+            case '\n':
+                break;
+            default:
+                match = 0;
+        }
+        str++;
+    }
+    put_ins(ins);
+    if (match) {
+        exe_line(ins_arr2);
+        ins_pos2 = 0;
+        strcpy(outputText, "");
+    } else
+        strcpy(outputText, "Error: No such instruction!");
+    int_flag2 = 0;
+}
+
 void draw_window() {
     SDL_RenderClear(renderer);
     SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, 600, 800);
     SDL_SetRenderTarget(renderer, texture);
     SDL_RenderClear(renderer);
+
+    SDL_RenderCopy(renderer, texture1, NULL, NULL);
+
+
     for (int i = 0; i < button_num; i++) {
         if (i == current_button) {
             if (i == click_button)
@@ -1521,12 +1793,43 @@ void draw_window() {
                                button_color[Black][3]);
         SDL_RenderDrawRect(renderer, &rect);
     }
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_Color inputColor = {255, 255, 255, 255};
+    SDL_Color outputColor = {255, 255, 255, 255};
+    // 渲染输入文本框
+    if (inputText[0]) {
+        int len = strlen(inputText) - 28;
+        len = len < 0 ? 0 : len;
+        SDL_Surface *inputSurface = TTF_RenderText_Solid(font, inputText + len, inputColor);
+        SDL_Texture *inputTexture = SDL_CreateTextureFromSurface(renderer, inputSurface);
+        SDL_Rect inputRect = {250, 300, inputSurface->w, inputSurface->h};
+        SDL_RenderCopy(renderer, inputTexture, NULL, &inputRect);
+        SDL_DestroyTexture(inputTexture);
+        SDL_FreeSurface(inputSurface);
+    }
+    // 渲染输出文本框
+    if (outputText[0]) {
+        SDL_Surface *outputSurface = TTF_RenderText_Solid(font, outputText, outputColor);
+        SDL_Texture *outputTexture = SDL_CreateTextureFromSurface(renderer, outputSurface);
+        SDL_Rect outputRect = {250, 400, outputSurface->w, outputSurface->h};
+        SDL_RenderCopy(renderer, outputTexture, NULL, &outputRect);
+        SDL_DestroyTexture(outputTexture);
+        SDL_FreeSurface(outputSurface);
+    }
+
+    // 将文本框渲染到窗口上
+
+
+
+
+
     SDL_SetRenderTarget(renderer, NULL);
 
     // 将纹理渲染到屏幕上
     SDL_RenderCopy(renderer, texture, NULL, NULL);
 
     // 更新屏幕
+
     SDL_RenderPresent(renderer);
     SDL_DestroyTexture(texture);
 }
